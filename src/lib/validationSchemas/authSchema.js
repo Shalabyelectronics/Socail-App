@@ -7,7 +7,12 @@ export const registerSchema = z
       .string()
       .nonempty("Name is required")
       .min(3, "Chars not less than 3 charectors")
-      .max(5, "Chars not exceed 5 charectors"),
+      .max(20, "Chars not exceed 5 charectors"),
+    username: z
+      .string()
+      .nonempty("Username is required")
+      .min(3, "Chars not less than 3 charectors")
+      .max(15, "Char not exceed 10 chars."),
     email: z.string().nonempty("Email is required").email("Invalid email"),
     password: z
       .string()

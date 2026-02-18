@@ -7,16 +7,13 @@ import { useForm } from "react-hook-form";
 import { loginSchema } from "../../../lib/validationSchemas/authSchema";
 import { Input, Button } from "@heroui/react";
 import { loginService } from "../../../services/authServices";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../../components/AuthContext/AuthContextProvider";
 
 export default function Login() {
   const [isShowPass, setIsShowPass] = useState(false);
   const { token, setToken, isAuthReady } = useContext(AuthContext);
   const navigate = useNavigate();
-  
-
-
 
   const {
     register,
@@ -35,7 +32,7 @@ export default function Login() {
     try {
       const response = await loginService(data);
       toast.success(response.data.message);
-      setToken(response.data.token);
+      setToken(response.data.data.token);
       navigate("/profile");
     } catch (error) {
       toast.error(error.response.data.error);
@@ -96,6 +93,12 @@ export default function Login() {
           </Button>
         </div>
       </form>
+      <p className="text-center pb-4 md:w-[90%] lg:w-[70%]">
+        Please register if you do not have an account?{" "}
+        <Link className="text-blue-600 font-semibold" to="/register">
+          Register
+        </Link>
+      </p>
     </>
   );
 }

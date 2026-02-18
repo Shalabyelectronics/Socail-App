@@ -24,6 +24,7 @@ export default function Register() {
     mode: "onChange",
     defaultValues: {
       name: "",
+      username:"",
       email: "",
       password: "",
       rePassword: "",
@@ -72,6 +73,18 @@ export default function Register() {
             className="pb-4"
             classNames={{
               inputWrapper: errors.name ? "border-red-600" : "",
+            }}
+          />
+          <Input
+            {...register("username")}
+            label="username"
+            isInvalid={!!errors.username}
+            errorMessage={errors.username?.message}
+            type="text"
+            variant="bordered"
+            className="pb-4"
+            classNames={{
+              inputWrapper: errors.username ? "border-red-600" : "",
             }}
           />
 
