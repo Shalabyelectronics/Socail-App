@@ -10,18 +10,18 @@
 
 | Stat                   | Value |
 | ---------------------- | ----- |
-| **Total XP**           | 20    |
+| **Total XP**           | 90    |
 | **Level**              | 1     |
-| **Commits**            | 1     |
-| **Features Completed** | 0     |
+| **Commits**            | 2     |
+| **Features Completed** | 1     |
 | **Deployments**        | 0     |
-| **Current Streak**     | 1     |
+| **Current Streak**     | 2     |
 
 ---
 
 ## 🎯 XP TO NEXT LEVEL
 
-- Level 1 → Level 2: 100 XP (20/100)
+- Level 1 → Level 2: 100 XP (90/100)
 
 ---
 
@@ -33,10 +33,16 @@
 
 - [x] Initialize Git repository (+20 XP)
   - Commit: `ab0618c - chore: initialize React socail app project`
+- [x] Mission 2: Environment Setup & Authentication Testing (+50 XP)
+  - Added username field to registration
+  - Improved navigation between login/register
+  - Created `.env.local` with API base URL
+  - ✅ **Tested & Verified:** Login & Register working perfectly!
+  - Commit: `7437988 - feat: add username field and improve auth navigation` (+20 XP)
 
 ### 🔄 IN PROGRESS
 
-- [ ] Mission 2: Environment Setup & Authentication Testing
+- [ ] Mission 3: Build NewsFeed Page with API Integration
 
 ### 📋 UPCOMING QUESTS
 
@@ -53,16 +59,19 @@
 
 _No achievements unlocked yet..._
 
----
+---System\*\* ✅
 
-## 📈 PROJECT STATUS
+- Login page with form validation
+- Register page with username field
+- Token management (localStorage persistence)
+- Protected routes working
+- Auth services connected to API
+- **TESTED & WORKING**
 
-### ✅ **COMPLETED FEATURES**
+### 🚧 **IN PROGRESS**
 
-1. **Authentication UI** (Login + Register pages)
-2. **Auth Context** (Token management)
-3. **Protected Routes** (App & Auth guards)
-4. **Routing Structure** (React Router Dom configured)
+- NewsFeed Page (Next up)outing Structure\*\* (React Router Dom configured)
+
 5. **Auth Services** (API integration ready)
 6. **Layouts** (Main & Auth layouts)
 
@@ -89,10 +98,13 @@ _To be revealed as you progress..._
 
 ## 📝 NOTES
 
-- Authentication system is fully built but not tested yet
-- API Base URL needs to be configured in `.env` file
-- Environment variable: `VITE_BASE_URL=https://route-posts.routemisr.com/`
+✅ Authentication system fully working and tested
+
+- ✅ `.env.local` configured with API base URL
+- 🎯 **Only 10 XP away from Level 2!**
+- Next target: NewsFeed with posts listing
 
 ---
 
+**Last Updated:** Feb 18, 2026 (Evening Session)
 **Last Updated:** Feb 18, 2026

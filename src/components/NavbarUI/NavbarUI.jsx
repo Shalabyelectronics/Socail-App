@@ -22,7 +22,7 @@ import { AuthContext } from "../AuthContext/AuthContextProvider";
 export default function NavbarUI() {
   const { setToken } = useContext(AuthContext);
   return (
-    <Navbar maxWidth="lg">
+    <Navbar maxWidth="xl">
       <NavbarBrand>
         <img src={socialAppLogo} alt="Socail App logo" width={90} />
         <p className="font-bold text-inherit">Social App</p>

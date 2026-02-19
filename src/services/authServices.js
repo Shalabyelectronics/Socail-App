@@ -2,6 +2,8 @@ import axios from "axios";
 const BaseURL = import.meta.env.VITE_BASE_URL;
 const registerEndPoint = "/users/signup";
 const loginEndPoint = "/users/signin";
+
+
 export const registerService = async (body) => {
   const response = axios.post(BaseURL + registerEndPoint, body, {
     headers: {
@@ -20,3 +22,4 @@ export const loginService = async (body) => {
 
   return response;
 };
+

@@ -42,8 +42,8 @@ export default function Register() {
 
       navigate("/login");
     } catch (error) {
-      const errorMSG = error.response?.data?.error;
-      console.log(error);
+      const errorMSG = error.response.data.message;
+      
       toast.error(errorMSG);
       if (errorMSG === "user already exists.") {
         navigate("/login");
