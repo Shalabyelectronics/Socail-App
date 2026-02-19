@@ -5,7 +5,6 @@ import {
   CardBody,
   CardFooter,
   Avatar,
-  Button,
   Tooltip,
   Divider,
 } from "@heroui/react";
@@ -15,16 +14,14 @@ import {
   Repeat,
   Bookmark,
   BookmarkCheck,
-  Lock,
   Globe,
-  Clock,
+  LockIcon,
 } from "lucide-react";
 
 export default function PostCard({ post }) {
   return (
     <>
       <Card
-        key={post._id}
         className="w-full shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 mb-4"
       >
         {/* Header - User + time + privacy */}
@@ -41,7 +38,7 @@ export default function PostCard({ post }) {
                 {post.user.name}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                @{post.user.username} •{" "}
+                {post.user.username ? `@${post.user.username} • ` : ""}
                 {new Date(post.createdAt).toLocaleDateString()}
               </p>
             </div>
@@ -49,7 +46,11 @@ export default function PostCard({ post }) {
 
           <Tooltip content={post.privacy}>
             <span>
-              <Globe size={16} className="text-default-400" />
+              {post.privacy === "public" ? (
+                <Globe size={16} className="text-default-400" />
+              ) : (
+                <LockIcon size={16} className="text-default-400" />
+              )}
             </span>
           </Tooltip>
         </CardHeader>
@@ -77,7 +78,10 @@ export default function PostCard({ post }) {
           {post.isShare && post.sharedPost && (
             <div className="mt-4 p-4 border-l-4 border-pink-500 bg-gray-50 dark:bg-gray-800/50 rounded-r-lg">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                Shared post from @{post.sharedPost.user.username}
+                Shared post from{" "}
+                {post.sharedPost?.user?.username
+                  ? `@${post.sharedPost.user.username}`
+                  : "Unknown user"}
               </p>
               {post.sharedPost.body && (
                 <p className="mb-3">{post.sharedPost.body}</p>
@@ -97,18 +101,23 @@ export default function PostCard({ post }) {
         <CardFooter className="px-5 py-3 flex justify-between items-center border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
           <div className="flex gap-6 text-sm">
             <button className="flex items-center gap-1.5 hover:text-pink-600 transition-colors">
-              <Heart size={16} /> <span>{post.likesCount}</span>
+              <Heart size={16} /> <span>{post?.likesCount || 0}</span>
             </button>
             <button className="flex items-center gap-1.5 hover:text-pink-600 transition-colors">
-              <MessageCircle size={16} /> <span>{post.commentsCount}</span>
+              <MessageCircle size={16} />{" "}
+              <span>{post?.commentsCount || 0}</span>
             </button>
             <button className="flex items-center gap-1.5 hover:text-pink-600 transition-colors">
-              <Repeat size={16} /> <span>{post.sharesCount}</span>
+              <Repeat size={16} /> <span>{post?.sharesCount || 0}</span>
             </button>
           </div>
 
-          <button className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-pink-600 transition-colors">
-            <Bookmark size={16} /> {post.bookmarked ? "Bookmarked" : ""}
+          <button className="flex items-center  gap-1.5 text-sm text-gray-500 hover:text-pink-600 transition-colors">
+            {post.bookmarked ? (
+              <BookmarkCheck size={16} />
+            ) : (
+              <Bookmark size={16} />
+            )}
           </button>
         </CardFooter>
       </Card>
