@@ -1,6 +1,7 @@
 import axios from "axios";
 const BaseURL = import.meta.env.VITE_BASE_URL;
 const newsFeedEndPoint = "/posts";
+const postDetailsEndPoint = "/posts/"
 export const newsFeedService = async (token) => {
   const response = axios.get(BaseURL + newsFeedEndPoint, {
     headers: {
@@ -8,6 +9,15 @@ export const newsFeedService = async (token) => {
       token: token,
     },
   });
-  console.log("Here is the posts response", response);
+  return response;
+};
+export const postDetailsService = async (token, postID) => {
+  const response = axios.get(BaseURL + postDetailsEndPoint+postID, {
+    headers: {
+      "Content-Type": "application/json",
+      token: token,
+    },
+  });
+ 
   return response;
 };

@@ -11,6 +11,7 @@ import { ToastContainer } from "react-toastify";
 import AppProtectedRoutes from "./components/ProtectedRoutes/AppProtectedRoutes.jsx";
 import AuthProtextedRoutes from "./components/ProtectedRoutes/AuthProtextedRoutes.jsx";
 import AuthContextProvider from "./components/AuthContext/AuthContextProvider.jsx";
+import PostDetails from "./components/PostDetails/PostDetails.jsx";
 
 function App() {
   const routes = createBrowserRouter([
@@ -31,6 +32,14 @@ function App() {
           element: (
             <AppProtectedRoutes>
               <UserPosts />
+            </AppProtectedRoutes>
+          ),
+        },
+        {
+          path: "post/:id",
+          element: (
+            <AppProtectedRoutes>
+              <PostDetails />
             </AppProtectedRoutes>
           ),
         },

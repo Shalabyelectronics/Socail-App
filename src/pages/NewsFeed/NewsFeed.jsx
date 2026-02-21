@@ -9,18 +9,18 @@ export default function NewsFeed() {
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useContext(AuthContext);
   useEffect(() => {
-    console.log("Start fetching posts");
+   
     const getPosts = async () => {
       try {
         setIsLoading(true);
         const response = await newsFeedService(token);
         setPosts(response.data.data.posts);
-        console.log(response.data.data.posts);
+       
       } catch (error) {
         console.error(error.response.data.message);
       } finally {
         setIsLoading(false);
-        console.log("Done from Fetching posts");
+       
       }
     };
     getPosts();
@@ -32,7 +32,7 @@ export default function NewsFeed() {
           <Spinner size="lg" />
         </div>
       ) : (
-        posts.map((post) => <PostCard key={post.id} post={post} />)
+        posts.map((post) => <PostCard key={post._id} post={post} isDetailsView={false}/>)
       )}
     </>
   );
