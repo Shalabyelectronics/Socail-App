@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Gamification tracking
+GAMIFICATION_LOG.md

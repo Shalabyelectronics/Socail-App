@@ -29,12 +29,12 @@ export default function NewsFeed() {
         <div className="flex justify-center items-center min-h-screen">
           <Spinner size="lg" />
         </div>
-      ) : posts.length ? (
+      ) : posts?.length ? (
         posts.map((post) => (
           <PostCard key={post._id} post={post} isDetailsView={false} />
         ))
       ) : (
-        <NoPosts />
+        <NoPosts routeToLink="/profile" routeToMessage="Go to Your Profile" />
       )}
     </>
   );

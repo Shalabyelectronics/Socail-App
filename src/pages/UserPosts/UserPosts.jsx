@@ -1,9 +1,40 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../components/AuthContext/AuthContextProvider";
+import PostCard from "../../components/PostCard/PostCard";
+import { Spinner } from "@heroui/react";
+import NoPosts from "../../components/NoPosts/NoPosts";
+import { getUserPostsService } from "../../services/postServices";
 
 export default function UserPosts() {
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { token } = useContext(AuthContext);
+  useEffect(() => {
+    const getUserPosts = async () => {
+      try {
+        const response = await getUserPostsService(token);
+        setPosts(response.data.data.posts);
+      } catch (error) {
+        console.error(error.response.data.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    getUserPosts();
+  }, [token]);
   return (
-    <div>
-      userposts
-    </div>
-  )
+    <>
+      {isLoading ? (
+        <div className="flex justify-center items-center min-h-screen">
+          <Spinner size="lg" />
+        </div>
+      ) : posts?.length ? (
+        posts.map((post) => (
+          <PostCard key={post._id} post={post} isDetailsView={false} />
+        ))
+      ) : (
+        <NoPosts routeToLink="/" routeToMessage="Go to Your News Feed" />
+      )}
+    </>
+  );
 }

@@ -3,7 +3,7 @@ import { Card, CardHeader, CardBody, CardFooter, Divider } from "@heroui/react";
 import { Link } from "react-router-dom";
 import { FileQuestion } from "lucide-react";
 
-export default function NoPosts() {
+export default function NoPosts({routeToLink, routeToMessage }) {
   return (
     <div className="flex justify-center items-center w-full mt-12 px-4">
       <Card className="w-full max-w-[400px] shadow-lg border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
@@ -28,10 +28,10 @@ export default function NoPosts() {
         
         <CardFooter className="justify-center pb-6 pt-4 bg-gray-50 dark:bg-gray-900/50">
           <Link 
-            to="/profile"
+            to={routeToLink}
             className="inline-flex items-center justify-center bg-[#FF3131] hover:bg-[#5E17EB] text-white font-medium py-2 px-6 rounded-full transition-colors duration-300 shadow-sm hover:shadow-md"
           >
-            Go to your Profile
+            {routeToMessage}
           </Link>
         </CardFooter>
       </Card>
