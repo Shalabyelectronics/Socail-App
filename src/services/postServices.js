@@ -3,12 +3,16 @@ const BaseURL = import.meta.env.VITE_BASE_URL;
 const newsFeedEndPoint = "/posts";
 const postDetailsEndPoint = "/posts/";
 const userPostsEndPoint = "/posts/feed?only=me";
-export const newsFeedService = async (token) => {
+export const newsFeedService = async (token,page=1,limit=10) => {
   const response = axios.get(BaseURL + newsFeedEndPoint, {
     headers: {
       "Content-Type": "application/json",
       token: token,
     },
+    params:{
+      page:page,
+      limit:limit,
+    }
   });
   return response;
 };

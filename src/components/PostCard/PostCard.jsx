@@ -19,17 +19,15 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { formattedDate } from "../../lib/tools";
 
-export default function PostCard({ post , isDetailsView}) {
+export default function PostCard({ post, isDetailsView }) {
   if (!post) return null;
   const navigate = useNavigate();
 
-
   const getPostDetails = () => {
-    console.log("HERE is GotPostDetails");
-    console.log(isDetailsView)
     if (!isDetailsView) {
-      console.log("If not Details Navigate to post details")
+      console.log("If not Details Navigate to post details");
       navigate(`/post/${post._id}`, { replace: true });
     } else {
       console.log("show comments");
@@ -43,7 +41,7 @@ export default function PostCard({ post , isDetailsView}) {
       <CardHeader className="flex justify-between items-center px-5 pt-5 pb-3">
         <div className="flex items-center gap-3">
           <Avatar
-            src={user?.photo || "https://via.placeholder.com/80?text=😏"}
+            src={user?.photo || "https://placehold.co/80x80?text=User"}
             alt={user?.name || "User"}
             size="md"
             className="ring-2 ring-pink-500 ring-offset-2"
@@ -53,9 +51,12 @@ export default function PostCard({ post , isDetailsView}) {
               {user?.name || "Anonymous hottie"}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {user?.username ? `@${user.username} • ` : ""}
+              {user?.username ? `@${user.username} • ` : "@default_user • "}
               {post?.createdAt
-                ? new Date(post.createdAt).toLocaleDateString()
+                ? new Date(post.createdAt)
+                    .toLocaleString("en-US", formattedDate)
+                    .replace(/\//g, "-")
+                    .replace(", ", " | ")
                 : "Just now"}
             </p>
           </div>
