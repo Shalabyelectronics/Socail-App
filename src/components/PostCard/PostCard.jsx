@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Card,
   CardHeader,
@@ -18,8 +18,8 @@ import {
   LockIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { formattedDate } from "../../lib/tools";
+import CommentsList from "../CommentsList/CommentsList";
 
 export default function PostCard({ post, isDetailsView }) {
   if (!post) return null;
@@ -27,7 +27,6 @@ export default function PostCard({ post, isDetailsView }) {
 
   const getPostDetails = () => {
     if (!isDetailsView) {
-      console.log("If not Details Navigate to post details");
       navigate(`/post/${post._id}`, { replace: true });
     } else {
       console.log("show comments");
@@ -35,6 +34,8 @@ export default function PostCard({ post, isDetailsView }) {
   };
 
   const user = post?.user || {};
+
+  const showTopComment = post?.topComment ? [post.topComment] : [];
 
   return (
     <Card className="w-full shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 mb-4">
@@ -54,7 +55,7 @@ export default function PostCard({ post, isDetailsView }) {
               {user?.username ? `@${user.username} • ` : "@default_user • "}
               {post?.createdAt
                 ? new Date(post.createdAt)
-                    .toLocaleString("en-US", formattedDate)
+                    .toLocaleString("en-GB", formattedDate)
                     .replace(/\//g, "-")
                     .replace(", ", " | ")
                 : "Just now"}
@@ -136,6 +137,14 @@ export default function PostCard({ post, isDetailsView }) {
           )}
         </button>
       </CardFooter>
+      {!isDetailsView && showTopComment.length > 0 && (
+        <>
+          <Divider />
+          <div className="px-5 py-4 bg-gray-50/50 dark:bg-gray-900/30">
+            <CommentsList comments={showTopComment} />
+          </div>
+        </>
+      )}
     </Card>
   );
 }

@@ -10,6 +10,7 @@ import { newsFeedService } from "../../services/postServices";
 import { Spinner } from "@heroui/react";
 import PostCard from "../../components/PostCard/PostCard";
 import NoPosts from "../../components/NoPosts/NoPosts";
+import { toast } from "react-toastify";
 
 export default function NewsFeed() {
   const [posts, setPosts] = useState([]);
@@ -46,11 +47,12 @@ export default function NewsFeed() {
           setHasMore(false);
         } else {
           setPosts((prevPosts) =>
-            currentPage === 1 ? newPosts : [...prevPosts, ...newPosts],
+            currentPage === 1 ? newPosts : [...prevPosts, ...newPosts.slice(1)],
           );
         }
       } catch (error) {
         console.error(error.response?.data.message || "Error fetching Posts");
+        toast.error(error.response?.data.message || "Error fetching Posts")
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);

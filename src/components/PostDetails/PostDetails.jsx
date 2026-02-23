@@ -3,7 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button, Spinner } from "@heroui/react";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 import PostCard from "../PostCard/PostCard";
+import CommentsList from "../CommentsList/CommentsList";
 import { postDetailsService } from "../../services/postServices";
+import { getCommentsService } from "../../services/commentsServices";
 
 export default function PostDetails() {
   const { id } = useParams();
@@ -60,7 +62,74 @@ export default function PostDetails() {
       },
     },
   };
+  const postComments = {
+    success: true,
+    message: "success",
+    data: {
+      comments: [
+        {
+          _id: "699aefe6056bdb76270e2fef",
+          content: "asdasd",
+          commentCreator: {
+            _id: "6994b602056bdb7627d2176f",
+            name: "Hamada",
+            username: "hamada4",
+            photo:
+              "https://pub-3cba56bacf9f4965bbb0989e07dada12.r2.dev/linkedPosts/default-profile.png",
+          },
+          post: "699ae9fb056bdb76270e1c49",
+          parentComment: null,
+          likes: [],
+          createdAt: "2026-02-22T12:00:38.261Z",
+          repliesCount: 0,
+        },
+        {
+          _id: "699aea45056bdb76270e1d42",
+          content: "Maadi new comment 2",
+          commentCreator: {
+            _id: "6994b602056bdb7627d2176f",
+            name: "Hamada",
+            username: "hamada4",
+            photo:
+              "https://pub-3cba56bacf9f4965bbb0989e07dada12.r2.dev/linkedPosts/default-profile.png",
+          },
+          post: "699ae9fb056bdb76270e1c49",
+          parentComment: null,
+          likes: [],
+          createdAt: "2026-02-22T11:36:37.826Z",
+          repliesCount: 0,
+        },
+        {
+          _id: "699aea11056bdb76270e1cba",
+          content: "Maadi new comment 1",
+          commentCreator: {
+            _id: "6994b602056bdb7627d2176f",
+            name: "Hamada",
+            username: "hamada4",
+            photo:
+              "https://pub-3cba56bacf9f4965bbb0989e07dada12.r2.dev/linkedPosts/default-profile.png",
+          },
+          post: "699ae9fb056bdb76270e1c49",
+          parentComment: null,
+          likes: [],
+          createdAt: "2026-02-22T11:35:45.209Z",
+          repliesCount: 0,
+        },
+      ],
+    },
+    meta: {
+      pagination: {
+        currentPage: 1,
+        limit: 20,
+        total: 3,
+        numberOfPages: 1,
+      },
+    },
+  };
   const [post, setPost] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+
   useEffect(() => {
     const getPostDetails = async () => {
       try {
@@ -75,6 +144,22 @@ export default function PostDetails() {
     };
     getPostDetails();
   }, [token, id]);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (!id) return;
+      try {
+        setIsLoadingComments(true);
+        const response = await getCommentsService(token, id);
+        setComments(response.data.data.comments);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      } finally {
+        setIsLoadingComments(false);
+      }
+    };
+    fetchComments();
+  }, [token, id]);
   return (
     <>
       {isLoading ? (
@@ -82,12 +167,30 @@ export default function PostDetails() {
           <Spinner size="lg" />
         </div>
       ) : (
-        <>
-          <PostCard post={post} isDetailsView={true} />{" "}
-          <Button color="primary" onClick={() => navigate("/")}>
-            Back to Feed
+        <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto">
+          <PostCard post={post} isDetailsView={true} />
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+            <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
+              Comments ({comments.length})
+            </h3>
+            {isLoadingComments ? (
+              <div className="flex justify-center py-8">
+                <Spinner size="md" />
+              </div>
+            ) : (
+              <CommentsList comments={comments} />
+            )}
+          </div>
+
+          <Button
+            color="primary"
+            onClick={() => navigate("/")}
+            className="mb-4"
+          >
+            ← Back to Feed
           </Button>
-        </>
+        </div>
       )}
     </>
   );
