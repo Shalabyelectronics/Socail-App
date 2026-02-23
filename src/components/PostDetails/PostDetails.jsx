@@ -14,6 +14,8 @@ export default function PostDetails() {
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
+  const [commentsPage, setCommentsPage] = useState(1);
+  const [hasMoreComments, setHasMoreComments] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
 
   useEffect(() => {
@@ -36,8 +38,19 @@ export default function PostDetails() {
       if (!id) return;
       try {
         setIsLoadingComments(true);
-        const response = await getCommentsService(token, id);
-        setComments(response.data.data.comments);
+        const response = await getCommentsService(token, id, commentsPage, 2);
+        const newComments = response.data.data.comments;
+
+        if (commentsPage === 1) {
+          setComments(newComments);
+        } else {
+          setComments((prev) => [...prev, ...newComments]);
+        }
+
+        const totalPages = response.data.meta.pagination.numberOfPages;
+        if (commentsPage >= totalPages) {
+          setHasMoreComments(false);
+        }
       } catch (error) {
         console.error("Error fetching comments:", error);
       } finally {
@@ -45,7 +58,7 @@ export default function PostDetails() {
       }
     };
     fetchComments();
-  }, [token, id]);
+  }, [token, id, commentsPage]);
   return (
     <>
       {isLoading ? (
@@ -66,6 +79,17 @@ export default function PostDetails() {
               </div>
             ) : (
               <CommentsList comments={comments} />
+            )}
+            {hasMoreComments && !isLoadingComments && (
+              <Button
+                size="sm"
+                variant="flat"
+                color="secondary"
+                onClick={() => setCommentsPage((prev) => prev + 1)}
+                className="w-full mt-4"
+              >
+                Load More Comments
+              </Button>
             )}
           </div>
 
