@@ -31,7 +31,10 @@ export default function CommentsList({ comments }) {
         <div key={comment._id} className="flex flex-col gap-1.5">
           <div className="flex gap-3 items-start">
             <Avatar
-              src={comment.commentCreator?.photo || "https://via.placeholder.com/40"}
+              src={
+                comment.commentCreator?.photo ||
+                "https://via.placeholder.com/40"
+              }
               alt={comment.commentCreator?.name || "User"}
               size="sm"
               className="ring-2 ring-[#5E17EB] ring-offset-1 flex-shrink-0 mt-1"
@@ -56,7 +59,8 @@ export default function CommentsList({ comments }) {
                   <Heart size={14} /> <span>{comment.likes?.length || 0}</span>
                 </button>
                 <button className="flex items-center gap-1 hover:text-[#5E17EB] transition-colors cursor-pointer">
-                  <MessageSquare size={14} /> <span>{comment.repliesCount || 0} Reply</span>
+                  <MessageSquare size={14} />{" "}
+                  <span>{comment.repliesCount || 0} Reply</span>
                 </button>
               </div>
             </div>
