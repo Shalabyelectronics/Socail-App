@@ -1,18 +1,19 @@
 import axios from "axios";
 const BaseURL = import.meta.env.VITE_BASE_URL;
 const newsFeedEndPoint = "/posts";
+const createPostEndPoint = "/posts";
 const postDetailsEndPoint = "/posts/";
 const userPostsEndPoint = "/posts/feed?only=me";
-export const newsFeedService = async (token,page=1,limit=10) => {
+export const newsFeedService = async (token, page = 1, limit = 10) => {
   const response = axios.get(BaseURL + newsFeedEndPoint, {
     headers: {
       "Content-Type": "application/json",
-      token: token,
+      Authorization: `Bearer ${token}`,
     },
-    params:{
-      page:page,
-      limit:limit,
-    }
+    params: {
+      page: page,
+      limit: limit,
+    },
   });
   return response;
 };
@@ -20,7 +21,7 @@ export const postDetailsService = async (token, postID) => {
   const response = axios.get(BaseURL + postDetailsEndPoint + postID, {
     headers: {
       "Content-Type": "application/json",
-      token: token,
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -32,6 +33,21 @@ export const getUserPostsService = async (token) => {
     headers: {
       "Content-Type": "application/json",
       token: token,
+    },
+  });
+  return response;
+};
+export const CreateUserPostsService = async (token, payLoad) => {
+  const data = new FormData();
+  if (payLoad.body) {
+    data.append("body", payLoad.body);
+  }
+  if (payLoad.image) {
+    data.append("image", payLoad.image);
+  }
+  const response = axios.post(BaseURL + createPostEndPoint, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
   });
   return response;

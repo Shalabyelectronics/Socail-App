@@ -1,12 +1,36 @@
 import React, { useEffect, useState, createContext } from "react";
+import { getUserProfileService } from "../../services/authServices";
+
 export const AuthContext = createContext();
 export default function AuthContextProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("userToken"));
+  const [user, setUser] = useState(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
 
   useEffect(() => {
     setIsAuthReady(true);
   }, []);
+
+  // Fetch user data when token changes
+  useEffect(() => {
+    if (!token) {
+      setUser(null);
+      return;
+    }
+
+    const fetchUserProfile = async () => {
+      try {
+        const response = await getUserProfileService(token);
+       
+        setUser(response.data.data.user);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        setUser(null);
+      }
+    };
+
+    fetchUserProfile();
+  }, [token]);
 
   useEffect(() => {
     if (!isAuthReady) return;
@@ -16,8 +40,9 @@ export default function AuthContextProvider({ children }) {
       localStorage.removeItem("userToken");
     }
   }, [token, isAuthReady]);
+
   return (
-    <AuthContext.Provider value={{ token, setToken, isAuthReady }}>
+    <AuthContext.Provider value={{ token, setToken, user, isAuthReady }}>
       {children}
     </AuthContext.Provider>
   );

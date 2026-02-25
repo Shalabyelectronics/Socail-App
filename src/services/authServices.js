@@ -2,7 +2,7 @@ import axios from "axios";
 const BaseURL = import.meta.env.VITE_BASE_URL;
 const registerEndPoint = "/users/signup";
 const loginEndPoint = "/users/signin";
-
+const userProfileEndPoint = "/users/profile-data";
 
 export const registerService = async (body) => {
   const response = axios.post(BaseURL + registerEndPoint, body, {
@@ -23,3 +23,13 @@ export const loginService = async (body) => {
   return response;
 };
 
+export const getUserProfileService = async (token) => {
+  const response = axios.get(BaseURL + userProfileEndPoint, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response;
+};
