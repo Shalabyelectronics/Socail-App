@@ -6,10 +6,13 @@ import PostCard from "../PostCard/PostCard";
 import CommentsList from "../CommentsList/CommentsList";
 import { postDetailsService } from "../../services/postServices";
 import { getCommentsService } from "../../services/commentsServices";
+import CommentCreation from "../CommentCreation/CommentCreation";
+import { createCommentService } from "../../services/commentsServices";
+import { toast } from "react-toastify";
 
 export default function PostDetails() {
   const { id } = useParams();
-  const { token } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
@@ -17,6 +20,7 @@ export default function PostDetails() {
   const [commentsPage, setCommentsPage] = useState(1);
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [isLoadingCreateCommet, setIsLoadingCreateCommet] = useState(false);
 
   useEffect(() => {
     const getPostDetails = async () => {
@@ -59,6 +63,41 @@ export default function PostDetails() {
     };
     fetchComments();
   }, [token, id, commentsPage]);
+
+  const refreshComments = async () => {
+    if (!id) return;
+    try {
+      setIsLoadingComments(true);
+      const response = await getCommentsService(token, id, 1, 10);
+      const newComments = response.data.data.comments;
+      setComments(newComments);
+      setCommentsPage(1);
+      setHasMoreComments(true);
+    } catch (error) {
+      console.error("Error refreshing comments:", error);
+    } finally {
+      setIsLoadingComments(false);
+    }
+  };
+
+  const onCreateComment = async (payLoad) => {
+    try {
+      setIsLoadingCreateCommet(true);
+      const response = await createCommentService(token, payLoad, id);
+      toast.success("Comment created successfully!");
+
+      // Refresh comments after successful creation
+      await refreshComments();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Can't create comment, try again later!",
+      );
+      console.error("Error on creating a comment", error);
+    } finally {
+      setIsLoadingCreateCommet(false);
+    }
+  };
   return (
     <>
       {isLoading ? (
@@ -68,6 +107,10 @@ export default function PostDetails() {
       ) : (
         <div className="flex flex-col gap-4 w-full max-w-2xl mx-auto">
           <PostCard post={post} isDetailsView={true} />
+          <CommentCreation
+            currentUser={user}
+            onCreateComment={onCreateComment}
+          />
 
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
             <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
