@@ -49,9 +49,23 @@ export default function CommentsList({ comments }) {
                     {formatCommentDate(comment.createdAt)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
-                  {comment.content}
-                </p>
+                {/* Comment Text */}
+                {comment.content && (
+                  <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+                    {comment.content}
+                  </p>
+                )}
+
+                {/* Comment Image */}
+                {comment.image && (
+                  <div className="mt-2 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <img
+                      src={comment.image}
+                      alt="comment media"
+                      className="w-full max-h-60 object-cover"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-4 mt-1.5 ml-2 text-xs text-gray-500 font-medium">

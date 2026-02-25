@@ -3,7 +3,6 @@ import {
   Navbar,
   NavbarBrand,
   NavbarContent,
-  NavbarItem,
   DropdownItem,
   DropdownTrigger,
   Dropdown,
@@ -11,6 +10,7 @@ import {
   Avatar,
   Input,
   Badge,
+  Skeleton,
 } from "@heroui/react";
 import { LuMessageSquareHeart } from "react-icons/lu";
 import { FaBell } from "react-icons/fa";
@@ -47,31 +47,37 @@ export default function NavbarUI() {
         </NavbarContent>
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
-            <Avatar
-              isBordered
-              as="button"
-              className="transition-transform"
-              color="secondary"
-              name={user?.name || "User"}
-              size="sm"
-              src={
-                user?.photo || "https://i.pravatar.cc/150?u=a042581f4e29026704d"
-              }
-            />
+            {user?.photo ? (
+              <Avatar
+                isBordered
+                as="button"
+                className="transition-transform"
+                color="secondary"
+                name={user?.name || "User"}
+                size="sm"
+                src={user.photo}
+              />
+            ) : (
+              <Skeleton className="w-8 h-8 rounded-full" />
+            )}
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
-            <DropdownItem key="profile" className="h-14 gap-2">
+            <DropdownItem key="user email account" className="h-14 gap-2">
               <p className="font-semibold">Signed in as</p>
               <p className="font-semibold">
                 {user?.email || "user@example.com"}
               </p>
             </DropdownItem>
-            <DropdownItem key="settings">
+            <DropdownItem key="profile">
               <Link className="w-full block" to="/profile">
                 My Profile
               </Link>
             </DropdownItem>
-
+            <DropdownItem key="Newfeed">
+              <Link className="w-full block" to="/">
+                News Feed
+              </Link>
+            </DropdownItem>
             <DropdownItem
               key="logout"
               color="danger"
