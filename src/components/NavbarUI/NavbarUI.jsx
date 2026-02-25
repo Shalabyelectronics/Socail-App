@@ -20,7 +20,7 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 
 export default function NavbarUI() {
-  const { setToken } = useContext(AuthContext);
+  const { setToken, user } = useContext(AuthContext);
   return (
     <Navbar maxWidth="xl">
       <NavbarBrand>
@@ -52,15 +52,19 @@ export default function NavbarUI() {
               as="button"
               className="transition-transform"
               color="secondary"
-              name="Jason Hughes"
+              name={user?.name || "User"}
               size="sm"
-              src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+              src={
+                user?.photo || "https://i.pravatar.cc/150?u=a042581f4e29026704d"
+              }
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             <DropdownItem key="profile" className="h-14 gap-2">
               <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">zoey@example.com</p>
+              <p className="font-semibold">
+                {user?.email || "user@example.com"}
+              </p>
             </DropdownItem>
             <DropdownItem key="settings">
               <Link className="w-full block" to="/profile">
