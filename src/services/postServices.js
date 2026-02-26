@@ -66,3 +66,20 @@ export const sharePostService = async (token, postID, body) => {
 
   return response;
 };
+
+export const likePostService = async (token, postID) => {
+  return await axios.put(
+    `${BaseURL}/posts/${postID}/like`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+};
+
+
+
+
+

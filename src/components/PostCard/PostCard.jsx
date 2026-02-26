@@ -20,7 +20,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { formattedDate } from "../../lib/tools";
 import CommentsList from "../CommentsList/CommentsList";
-import { sharePostService } from "../../services/postServices";
+import { likePostService, sharePostService } from "../../services/postServices";
 import SharePostModal from "../SharePostModal/SharePostModal";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
@@ -31,6 +31,8 @@ export default function PostCard({ post, isDetailsView, onRefetch }) {
 
   const { token } = useContext(AuthContext);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post?.likesCount || 0);
 
   const handleShare = async ({ postId, body }) => {
     try {
@@ -55,6 +57,21 @@ export default function PostCard({ post, isDetailsView, onRefetch }) {
       navigate(`/post/${post._id}`, { replace: true });
     } else {
       console.log("show comments");
+    }
+  };
+
+  const toggleLikePostHandler = async () => {
+    try {
+      const response = await likePostService(token, post._id);
+      const { liked, likesCount } = response.data.data;
+
+      setIsLiked(liked); // Use response to set correct state
+      setLikeCount(likesCount); // Use response to set correct count
+
+      toast.success(liked ? "You Liked this post 🎉" : "You unLiked this post");
+    } catch (error) {
+      console.error("Something went wrong", error);
+      toast.error("Failed to update like status");
     }
   };
 
@@ -140,8 +157,18 @@ export default function PostCard({ post, isDetailsView, onRefetch }) {
 
       <CardFooter className="px-5 py-3 flex justify-between items-center border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
         <div className="flex gap-6 text-sm">
-          <button className="flex items-center gap-1.5 hover:text-pink-600 transition-colors cursor-pointer">
-            <Heart size={16} /> <span>{post?.likesCount || 0}</span>
+          <button
+            className="flex items-center gap-1.5 hover:text-red-500 transition-colors cursor-pointer"
+            onClick={toggleLikePostHandler}
+          >
+            <Heart
+              size={16}
+              fill={isLiked ? "currentColor" : "none"}
+              className={isLiked ? "text-red-500" : "text-gray-500"}
+            />
+            <span className={isLiked ? "text-red-500" : ""}>
+              {likeCount || 0}
+            </span>
           </button>
           <button
             className="flex items-center gap-1.5 hover:text-pink-600 transition-colors cursor-pointer"

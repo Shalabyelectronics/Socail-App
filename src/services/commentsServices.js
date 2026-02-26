@@ -81,3 +81,16 @@ export const createCommentReplyService = async (
 
   return response;
 };
+
+
+export const likeCommentService = async (token, postID, commentID) => {
+  return await axios.put(
+    `${BaseURL}/posts/${postID}/comments/${commentID}/like`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+};
