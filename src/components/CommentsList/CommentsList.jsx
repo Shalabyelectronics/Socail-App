@@ -1,11 +1,15 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Avatar, Divider } from "@heroui/react";
 import { Heart, MessageSquare } from "lucide-react";
 import CommentReplyCreation from "../CommentReplyForm/CommentReplyForm";
-import { createCommentReplyService } from "../../services/commentsServices";
+import {
+  createCommentReplyService,
+  likeCommentService,
+} from "../../services/commentsServices";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 import CommentRepliesList from "../CommentRepliesList/CommentRepliesList";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function CommentsList({
   comments,
@@ -16,6 +20,8 @@ export default function CommentsList({
   const { token, user } = useContext(AuthContext);
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [openRepliesId, setOpenRepliesId] = useState(null);
+  const [likedByCommentId, setLikedByCommentId] = useState({});
+  const [likeCountByCommentId, setLikeCountByCommentId] = useState({});
   const navigate = useNavigate();
   if (!comments || comments.length === 0) {
     return (
@@ -37,6 +43,37 @@ export default function CommentsList({
       })
       .replace(/\//g, "-")
       .replace(", ", " | ");
+  };
+
+  useEffect(() => {
+    if (!comments) return;
+    const likedMap = {};
+    const countMap = {};
+    comments.forEach((comment) => {
+      const likes = comment.likes || [];
+      const userId = user?.id || user?._id;
+      likedMap[comment._id] = userId ? likes.includes(userId) : false;
+      countMap[comment._id] = comment.likesCount ?? likes.length ?? 0;
+    });
+    setLikedByCommentId(likedMap);
+    setLikeCountByCommentId(countMap);
+  }, [comments, user]);
+
+  const toggleLikeCommentHandler = async (commentId) => {
+    try {
+      const response = await likeCommentService(token, postID, commentId);
+      const { liked, likesCount } = response.data.data;
+
+      setLikedByCommentId((prev) => ({ ...prev, [commentId]: liked }));
+      setLikeCountByCommentId((prev) => ({ ...prev, [commentId]: likesCount }));
+
+      toast.success(
+        liked ? "You Liked this comment 🎉" : "You unLiked this comment",
+      );
+    } catch (error) {
+      console.error("Something went wrong", error);
+      toast.error("Failed to update like status");
+    }
   };
 
   return (
@@ -97,14 +134,34 @@ export default function CommentsList({
                       : `View replies (${comment.repliesCount})`}
                   </button>
                 )}
-                <button className="flex items-center gap-1 hover:text-[#FF3131] transition-colors cursor-pointer">
-                  <Heart size={14} /> <span>{comment.likes?.length || 0}</span>
+                <button
+                  className="flex items-center gap-1 hover:text-red-500 transition-colors cursor-pointer"
+                  onClick={() => toggleLikeCommentHandler(comment._id)}
+                >
+                  <Heart
+                    size={14}
+                    fill={
+                      likedByCommentId[comment._id] ? "currentColor" : "none"
+                    }
+                    className={
+                      likedByCommentId[comment._id]
+                        ? "text-red-500"
+                        : "text-gray-500"
+                    }
+                  />
+                  <span
+                    className={
+                      likedByCommentId[comment._id] ? "text-red-500" : ""
+                    }
+                  >
+                    {likeCountByCommentId[comment._id] || 0}
+                  </span>
                 </button>
                 <button
                   className="flex items-center gap-1 hover:text-[#5E17EB] transition-colors cursor-pointer"
                   onClick={() => {
                     if (!isDetailsView) {
-                      navigate(`/post/${postID}`, {replace:true});
+                      navigate(`/post/${postID}`, { replace: true });
                     } else {
                       setActiveReplyId((prev) =>
                         prev === comment._id ? null : comment._id,
