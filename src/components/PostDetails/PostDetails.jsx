@@ -121,7 +121,12 @@ export default function PostDetails() {
                 <Spinner size="md" />
               </div>
             ) : (
-              <CommentsList comments={comments} />
+              <CommentsList
+                comments={comments}
+                postID={id}
+                onRefetch={refreshComments}
+                isDetailsView={true}
+              />
             )}
             {hasMoreComments && !isLoadingComments && (
               <Button

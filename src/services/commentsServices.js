@@ -40,7 +40,28 @@ export const createCommentService = async (token, payLoad, postID) => {
 
   return response;
 };
-export const createCommentReplayService = async (token, payLoad, postID) => {
+
+export const getRepliesService = async (
+  token,
+  postID,
+  commentID,
+  page = 1,
+  limit = 10,
+) => {
+  return axios.get(`${BaseURL}/posts/${postID}/comments/${commentID}/replies`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: { page, limit },
+  });
+};
+
+export const createCommentReplyService = async (
+  token,
+  payLoad,
+  postID,
+  commentID,
+) => {
   const data = new FormData();
   if (payLoad.body) {
     data.append("content", payLoad.body);
@@ -49,7 +70,7 @@ export const createCommentReplayService = async (token, payLoad, postID) => {
     data.append("image", payLoad.image);
   }
   const response = axios.post(
-    BaseURL + "/posts/" + postID + "/comments" +"replies",
+    `${BaseURL}/posts/${postID}/comments/${commentID}/replies`,
     data,
     {
       headers: {

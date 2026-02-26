@@ -141,7 +141,11 @@ export default function PostCard({ post, isDetailsView }) {
         <>
           <Divider />
           <div className="px-5 py-4 bg-gray-50/50 dark:bg-gray-900/30">
-            <CommentsList comments={showTopComment} />
+            <CommentsList
+              comments={showTopComment}
+              postID={post._id}
+              isDetailsView={isDetailsView}
+            />
           </div>
         </>
       )}

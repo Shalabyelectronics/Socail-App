@@ -1,8 +1,22 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Avatar, Divider } from "@heroui/react";
 import { Heart, MessageSquare } from "lucide-react";
+import CommentReplyCreation from "../CommentReplyForm/CommentReplyForm";
+import { createCommentReplyService } from "../../services/commentsServices";
+import { AuthContext } from "../AuthContext/AuthContextProvider";
+import CommentRepliesList from "../CommentRepliesList/CommentRepliesList";
+import { useNavigate } from "react-router-dom";
 
-export default function CommentsList({ comments }) {
+export default function CommentsList({
+  comments,
+  postID,
+  onRefetch,
+  isDetailsView,
+}) {
+  const { token, user } = useContext(AuthContext);
+  const [activeReplyId, setActiveReplyId] = useState(null);
+  const [openRepliesId, setOpenRepliesId] = useState(null);
+  const navigate = useNavigate();
   if (!comments || comments.length === 0) {
     return (
       <div className="text-gray-500 text-sm py-4 text-center italic">
@@ -69,16 +83,67 @@ export default function CommentsList({ comments }) {
               </div>
 
               <div className="flex gap-4 mt-1.5 ml-2 text-xs text-gray-500 font-medium">
+                {comment.repliesCount > 0 && (
+                  <button
+                    className="ml-2 mt-1 text-xs text-[#5E17EB] hover:underline"
+                    onClick={() =>
+                      setOpenRepliesId((prev) =>
+                        prev === comment._id ? null : comment._id,
+                      )
+                    }
+                  >
+                    {openRepliesId === comment._id
+                      ? "Hide replies"
+                      : `View replies (${comment.repliesCount})`}
+                  </button>
+                )}
                 <button className="flex items-center gap-1 hover:text-[#FF3131] transition-colors cursor-pointer">
                   <Heart size={14} /> <span>{comment.likes?.length || 0}</span>
                 </button>
-                <button className="flex items-center gap-1 hover:text-[#5E17EB] transition-colors cursor-pointer">
+                <button
+                  className="flex items-center gap-1 hover:text-[#5E17EB] transition-colors cursor-pointer"
+                  onClick={() => {
+                    if (!isDetailsView) {
+                      navigate(`/post/${postID}`, {replace:true});
+                    } else {
+                      setActiveReplyId((prev) =>
+                        prev === comment._id ? null : comment._id,
+                      );
+                    }
+                  }}
+                >
                   <MessageSquare size={14} />{" "}
                   <span>{comment.repliesCount || 0} Reply</span>
                 </button>
               </div>
             </div>
           </div>
+          {activeReplyId === comment._id && (
+            <CommentReplyCreation
+              currentUser={user}
+              onCancel={() => setActiveReplyId(null)}
+              onSubmitReply={async (payload) => {
+                try {
+                  await createCommentReplyService(
+                    token,
+                    payload,
+                    postID,
+                    comment._id,
+                  );
+
+                  setActiveReplyId(null); // close reply box
+                  onRefetch?.(); // refetch all comments
+                } catch (error) {
+                  console.error("Error creating reply", error);
+                }
+              }}
+            />
+          )}
+          <CommentRepliesList
+            postId={postID}
+            commentId={comment._id}
+            isOpen={openRepliesId === comment._id}
+          />
           {index !== comments.length - 1 && (
             <Divider className="my-2 ml-12 w-[calc(100%-3rem)] bg-gray-200 dark:bg-gray-700" />
           )}
