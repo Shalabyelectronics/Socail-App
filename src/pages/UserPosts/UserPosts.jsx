@@ -9,18 +9,21 @@ export default function UserPosts() {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { token } = useContext(AuthContext);
+
+  const refreshUserPosts = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getUserPostsService(token);
+      setPosts(response.data.data.posts);
+    } catch (error) {
+      console.error(error.response.data.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const getUserPosts = async () => {
-      try {
-        const response = await getUserPostsService(token);
-        setPosts(response.data.data.posts);
-      } catch (error) {
-        console.error(error.response.data.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getUserPosts();
+    refreshUserPosts();
   }, [token]);
   return (
     <>
@@ -30,7 +33,12 @@ export default function UserPosts() {
         </div>
       ) : posts?.length ? (
         posts.map((post) => (
-          <PostCard key={post._id} post={post} isDetailsView={false} />
+          <PostCard
+            key={post._id}
+            post={post}
+            isDetailsView={false}
+            onRefetch={refreshUserPosts}
+          />
         ))
       ) : (
         <NoPosts routeToLink="/" routeToMessage="Go to Your News Feed" />

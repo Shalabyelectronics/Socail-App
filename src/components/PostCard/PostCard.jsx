@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -20,10 +20,35 @@ import {
 import { useNavigate } from "react-router-dom";
 import { formattedDate } from "../../lib/tools";
 import CommentsList from "../CommentsList/CommentsList";
+import { sharePostService } from "../../services/postServices";
+import SharePostModal from "../SharePostModal/SharePostModal";
+import { toast } from "react-toastify";
+import { AuthContext } from "../AuthContext/AuthContextProvider";
 
-export default function PostCard({ post, isDetailsView }) {
+export default function PostCard({ post, isDetailsView, onRefetch }) {
   if (!post) return null;
   const navigate = useNavigate();
+
+  const { token } = useContext(AuthContext);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+
+  const handleShare = async ({ postId, body }) => {
+    try {
+      await sharePostService(token, postId, body);
+      toast.success("Post shared successfully!");
+      // Optional: refresh feed (pass a prop from parent like onRefetch)
+      onRefetch?.();
+    } catch (error) {
+      // Handle specific error codes
+      if (error.response?.status === 409) {
+        toast.error("You already shared this post!");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to share post");
+      }
+      console.error("Share error:", error);
+      throw error; // so modal keeps loading behavior consistent
+    }
+  };
 
   const getPostDetails = () => {
     if (!isDetailsView) {
@@ -124,7 +149,10 @@ export default function PostCard({ post, isDetailsView }) {
           >
             <MessageCircle size={16} /> <span>{post?.commentsCount || 0}</span>
           </button>
-          <button className="flex items-center gap-1.5 hover:text-pink-600 transition-colors cursor-pointer">
+          <button
+            className="flex items-center gap-1.5 hover:text-pink-600 transition-colors cursor-pointer"
+            onClick={() => setIsShareOpen(true)}
+          >
             <Repeat size={16} /> <span>{post?.sharesCount || 0}</span>
           </button>
         </div>
@@ -149,6 +177,12 @@ export default function PostCard({ post, isDetailsView }) {
           </div>
         </>
       )}
+      <SharePostModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        onShare={handleShare}
+        post={post}
+      />
     </Card>
   );
 }
