@@ -103,13 +103,24 @@ export default function NewsFeed() {
           return (
             // Attach the observer ref to this specific element
             <div ref={lastPostElementRef} key={post._id} className="w-full">
-              <PostCard post={post} isDetailsView={false} />
+              <PostCard
+                post={post}
+                isDetailsView={false}
+                onRefetch={refreshPosts}
+              />
             </div>
           );
         }
 
         // Render normal posts without the ref
-        return <PostCard key={post._id} post={post} isDetailsView={false} />;
+        return (
+          <PostCard
+            key={post._id}
+            post={post}
+            isDetailsView={false}
+            onRefetch={refreshPosts}
+          />
+        );
       })}
 
       {isLoadingMore && (

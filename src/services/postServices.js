@@ -52,3 +52,17 @@ export const CreateUserPostsService = async (token, payLoad) => {
   });
   return response;
 };
+
+export const sharePostService = async (token, postID, body) => {
+  const response = axios.post(
+    `${BaseURL}/posts/${postID}/share`,
+    { body },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  return response;
+};
