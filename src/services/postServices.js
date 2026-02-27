@@ -104,3 +104,25 @@ export const bookmarkPostService = async (token, postID) => {
     },
   );
 };
+
+export const updatePostService = async (token, postID, payload) => {
+  const data = new FormData();
+  if (payload.body) data.append("body", payload.body);
+  if (payload.image) data.append("image", payload.image);
+  const response = axios.put(`${BaseURL}/posts/${postID}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};
+export const deletePostService = async (token, postID) => {
+  const response = axios.delete(`${BaseURL}/posts/${postID}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};
+
+

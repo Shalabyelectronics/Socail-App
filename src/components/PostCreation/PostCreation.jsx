@@ -68,21 +68,17 @@ export default function PostCreation({ onCreatePost }) {
     if (!body.trim() && !selectedFile) return;
     setIsUploading(true);
     try {
-      console.log("Active loader");
-      const response = await CreateUserPostsService(token, {
+      await CreateUserPostsService(token, {
         body,
         image: selectedFile,
       });
       resetForm();
       onCreatePost?.();
       toast.success("Post created successfully!");
-      console.log(response.data);
     } catch (error) {
-      console.error("Post requist Error when create new post", error);
       toast.error(error.response?.data?.message || "Failed to create post");
     } finally {
       setIsUploading(false);
-      console.log("Stop loader");
     }
   };
 
