@@ -12,7 +12,6 @@ import PostCard from "../../components/PostCard/PostCard";
 import NoPosts from "../../components/NoPosts/NoPosts";
 import { toast } from "react-toastify";
 import PostCreation from "./../../components/PostCreation/PostCreation";
-import { FeedContext } from "../../components/FeedContext/FeedContextProvider";
 
 export default function NewsFeed() {
   const [posts, setPosts] = useState([]);
@@ -21,7 +20,6 @@ export default function NewsFeed() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { token, user } = useContext(AuthContext);
-  const { setBookmarkCount } = useContext(FeedContext);
 
   const observer = useRef();
 
@@ -97,10 +95,6 @@ export default function NewsFeed() {
     }
   };
 
-  useEffect(() => {
-    const count = posts.filter((post) => post.bookmarked).length;
-    setBookmarkCount(count);
-  }, [posts, setBookmarkCount]);
   if (isLoading && currentPage === 1) {
     return (
       <div className="flex justify-center items-center min-h-screen">

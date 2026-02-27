@@ -18,7 +18,6 @@ export default function Bookmarks() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [lastBookmarkedCount, setLastBookmarkedCount] = useState(0);
   const { token } = useContext(AuthContext);
 
   const observer = useRef();

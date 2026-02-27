@@ -29,6 +29,7 @@ import {
 import SharePostModal from "../SharePostModal/SharePostModal";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
+import { FeedContext } from "../FeedContext/FeedContextProvider";
 import UserPostSetting from "./../UserPostSetting/UserPostSetting";
 import DeletePostModal from "../DeletePostModal/DeletePostModal";
 import EditPostModal from "../EditPostModal/EditPostModal";
@@ -47,6 +48,7 @@ export default function PostCard({
   const navigate = useNavigate();
 
   const { token, user: currentUser } = useContext(AuthContext);
+  const { refreshBookmarkCount } = useContext(FeedContext);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -128,6 +130,8 @@ export default function PostCard({
           ? "You Bookmarked this post 🎉"
           : "You unBookmarked this post",
       );
+
+      refreshBookmarkCount?.();
 
       // If unbookmarking and callback provided, notify parent to remove from list
       if (!bookmarked && onUnbookmark) {
