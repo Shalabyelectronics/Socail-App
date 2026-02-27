@@ -12,6 +12,7 @@ import PostCard from "../../components/PostCard/PostCard";
 import NoPosts from "../../components/NoPosts/NoPosts";
 import { toast } from "react-toastify";
 import PostCreation from "./../../components/PostCreation/PostCreation";
+import { FeedContext } from "../../components/FeedContext/FeedContextProvider";
 
 export default function NewsFeed() {
   const [posts, setPosts] = useState([]);
@@ -20,6 +21,7 @@ export default function NewsFeed() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { token, user } = useContext(AuthContext);
+  const { setBookmarkCount } = useContext(FeedContext);
 
   const observer = useRef();
 
@@ -36,12 +38,14 @@ export default function NewsFeed() {
     },
     [isLoadingMore, hasMore],
   );
+  const fetchPostsPage = async (page) => newsFeedService(token, page);
+
   useEffect(() => {
     const getPosts = async () => {
       if (currentPage === 1) setIsLoading(true);
       else setIsLoadingMore(true);
       try {
-        const response = await newsFeedService(token, currentPage);
+        const response = await fetchPostsPage(currentPage);
         const newPosts = response.data.data.posts;
 
         if (newPosts.length === 0) {
@@ -63,6 +67,28 @@ export default function NewsFeed() {
       getPosts();
     }
   }, [token, currentPage, hasMore]);
+
+  const refreshPosts = async () => {
+    setIsLoading(true);
+    setHasMore(true);
+    setCurrentPage(1);
+
+    try {
+      const response = await fetchPostsPage(1);
+      const newsPosts = response.data.data.posts;
+      setPosts(newsPosts);
+    } catch (error) {
+      console.error(error.response?.data.message || "Error fetching Posts");
+      toast.error(error.response?.data.message || "Error fetching Posts");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const count = posts.filter((post) => post.bookmarked).length;
+    setBookmarkCount(count);
+  }, [posts, setBookmarkCount]);
   if (isLoading && currentPage === 1) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -76,23 +102,6 @@ export default function NewsFeed() {
       <NoPosts routeToLink="/profile" routeToMessage="Go to Your Profile" />
     );
   }
-
-  const refreshPosts = async () => {
-    setIsLoading(true);
-    setHasMore(true);
-    setCurrentPage(1);
-
-    try {
-      const response = await newsFeedService(token);
-      const newsPosts = response.data.data.posts;
-      setPosts(newsPosts);
-    } catch (error) {
-      console.error(error.response?.data.message || "Error fetching Posts");
-      toast.error(error.response?.data.message || "Error fetching Posts");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="flex flex-col items-center w-full mx-auto">
