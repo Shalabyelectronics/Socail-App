@@ -68,6 +68,20 @@ export const bookmarkedFeedService = async (token, page = 1, limit = 10) => {
   return response;
 };
 
+export const getBookmarksService = async (token, page = 1, limit = 10) => {
+  const response = axios.get(`${BaseURL}/users/bookmarks`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      page: page,
+      limit: limit,
+    },
+  });
+  return response;
+};
+
 export const sharePostService = async (token, postID, body) => {
   const response = axios.post(
     `${BaseURL}/posts/${postID}/share`,
@@ -124,5 +138,3 @@ export const deletePostService = async (token, postID) => {
   });
   return response;
 };
-
-

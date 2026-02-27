@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from "react";
 import { AuthContext } from "../../components/AuthContext/AuthContextProvider";
-import { newsFeedService } from "../../services/postServices";
+import { getBookmarksService } from "../../services/postServices";
 import { Spinner } from "@heroui/react";
 import PostCard from "../../components/PostCard/PostCard";
 import NoPosts from "../../components/NoPosts/NoPosts";
@@ -37,10 +37,7 @@ export default function Bookmarks() {
     [isLoadingMore, hasMore],
   );
 
-  const fetchPostsPage = async (page) => newsFeedService(token, page);
-
-  // Filter to show only bookmarked posts
-  const bookmarkedPosts = posts.filter((post) => post.bookmarked);
+  const fetchPostsPage = async (page) => getBookmarksService(token, page);
 
   useEffect(() => {
     const getPosts = async () => {
@@ -54,24 +51,14 @@ export default function Bookmarks() {
       else setIsLoadingMore(true);
       try {
         const response = await fetchPostsPage(currentPage);
-        const newPosts = response.data.data.posts;
+        const newPosts = response.data.data.bookmarks;
 
         if (newPosts.length === 0) {
           setHasMore(false);
         } else {
           setPosts((prevPosts) =>
-            currentPage === 1 ? newPosts : [...prevPosts, ...newPosts.slice(1)],
+            currentPage === 1 ? newPosts : [...prevPosts, ...newPosts],
           );
-
-          // Check if we got any new bookmarked posts in this batch
-          const newBookmarkedCount = newPosts.filter(
-            (post) => post.bookmarked,
-          ).length;
-
-          // If no new bookmarked posts in this batch, stop loading more
-          if (newBookmarkedCount === 0) {
-            setHasMore(false);
-          }
         }
       } catch (error) {
         // Don't show toast for 401 errors (user will be redirected to login)
@@ -103,16 +90,14 @@ export default function Bookmarks() {
 
   return (
     <div className="flex flex-col gap-4">
-      {bookmarkedPosts.length === 0 ? (
+      {posts.length === 0 ? (
         <NoPosts message="No bookmarked posts yet. Start bookmarking posts to see them here!" />
       ) : (
         <>
-          {bookmarkedPosts.map((post, index) => (
+          {posts.map((post, index) => (
             <div
               key={post._id}
-              ref={
-                bookmarkedPosts.length === index + 1 ? lastPostElementRef : null
-              }
+              ref={posts.length === index + 1 ? lastPostElementRef : null}
             >
               <PostCard
                 post={post}
