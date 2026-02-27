@@ -74,7 +74,10 @@ export default function PostDetails() {
       }
     };
     fetchComments();
-  }, [token || !token) return;
+  }, [token, id, commentsPage]);
+
+  const refreshComments = async () => {
+    if (!id || !token) return;
     try {
       setIsLoadingComments(true);
       const response = await getCommentsService(token, id, 1, 10);
@@ -87,9 +90,6 @@ export default function PostDetails() {
       if (error.response?.status !== 401) {
         console.error("Error refreshing comments:", error);
       }
-      setHasMoreComments(true);
-    } catch (error) {
-      console.error("Error refreshing comments:", error);
     } finally {
       setIsLoadingComments(false);
     }
