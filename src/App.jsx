@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthLayout from "./Layouts/AuthLayout/AuthLayout";
 import NewsFeed from "./pages/NewsFeed/NewsFeed.jsx";
 import UserPosts from "./pages/UserPosts/UserPosts.jsx";
+import Bookmarks from "./pages/Bookmarks/Bookmarks.jsx";
 import NotFound from "./pages/NotFound/NotFound.jsx";
 import Login from "./pages/Authentication/Login/Login.jsx";
 import Register from "./pages/Authentication/Register/Register.jsx";
@@ -24,6 +25,14 @@ function App() {
           element: (
             <AppProtectedRoutes>
               <NewsFeed />
+            </AppProtectedRoutes>
+          ),
+        },
+        {
+          path: "bookmarks",
+          element: (
+            <AppProtectedRoutes>
+              <Bookmarks />
             </AppProtectedRoutes>
           ),
         },

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -7,32 +7,52 @@ import {
   Avatar,
   Tooltip,
   Divider,
+  Spinner,
 } from "@heroui/react";
 import {
   Heart,
   MessageCircle,
   Repeat,
   Bookmark,
-  BookmarkCheck,
   Globe,
   LockIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formattedDate } from "../../lib/tools";
 import CommentsList from "../CommentsList/CommentsList";
-import { likePostService, sharePostService } from "../../services/postServices";
+import {
+  bookmarkPostService,
+  likePostService,
+  sharePostService,
+} from "../../services/postServices";
 import SharePostModal from "../SharePostModal/SharePostModal";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 
-export default function PostCard({ post, isDetailsView, onRefetch }) {
+export default function PostCard({
+  post,
+  isDetailsView,
+  onRefetch,
+  onUnbookmark,
+}) {
   if (!post) return null;
   const navigate = useNavigate();
 
-  const { token } = useContext(AuthContext);
+  const { token, user: currentUser } = useContext(AuthContext);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [likeCount, setLikeCount] = useState(post?.likesCount || 0);
+  const [isLikeLoading, setIsLikeLoading] = useState(false);
+  const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
+
+  useEffect(() => {
+    const userId = currentUser?.id || currentUser?._id;
+    const likes = post?.likes || [];
+    setIsLiked(userId ? likes.includes(userId) : false);
+    setLikeCount(post?.likesCount ?? likes.length ?? 0);
+    setIsBookmarked(Boolean(post?.bookmarked));
+  }, [post, currentUser]);
 
   const handleShare = async ({ postId, body }) => {
     try {
@@ -61,6 +81,8 @@ export default function PostCard({ post, isDetailsView, onRefetch }) {
   };
 
   const toggleLikePostHandler = async () => {
+    if (isLikeLoading) return;
+    setIsLikeLoading(true);
     try {
       const response = await likePostService(token, post._id);
       const { liked, likesCount } = response.data.data;
@@ -72,10 +94,39 @@ export default function PostCard({ post, isDetailsView, onRefetch }) {
     } catch (error) {
       console.error("Something went wrong", error);
       toast.error("Failed to update like status");
+    } finally {
+      setIsLikeLoading(false);
+    }
+  };
+  const toggleBookmarkPostHandler = async () => {
+    if (isBookmarkLoading) return;
+    setIsBookmarkLoading(true);
+    try {
+      const response = await bookmarkPostService(token, post._id);
+
+      const { bookmarked, bookmarksCount } = response.data.data;
+
+      setIsBookmarked(bookmarked);
+
+      toast.success(
+        bookmarked
+          ? "You Bookmarked this post 🎉"
+          : "You unBookmarked this post",
+      );
+
+      // If unbookmarking and callback provided, notify parent to remove from list
+      if (!bookmarked && onUnbookmark) {
+        onUnbookmark();
+      }
+    } catch (error) {
+      console.error("Something went wrong", error);
+      toast.error("Failed to update bookmark status");
+    } finally {
+      setIsBookmarkLoading(false);
     }
   };
 
-  const user = post?.user || {};
+  const postUser = post?.user || {};
 
   const showTopComment = post?.topComment ? [post.topComment] : [];
 
@@ -84,17 +135,19 @@ export default function PostCard({ post, isDetailsView, onRefetch }) {
       <CardHeader className="flex justify-between items-center px-5 pt-5 pb-3">
         <div className="flex items-center gap-3">
           <Avatar
-            src={user?.photo || "https://placehold.co/80x80?text=User"}
-            alt={user?.name || "User"}
+            src={postUser?.photo || "https://placehold.co/80x80?text=User"}
+            alt={postUser?.name || "User"}
             size="md"
             className="ring-2 ring-pink-500 ring-offset-2"
           />
           <div>
             <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
-              {user?.name || "Anonymous hottie"}
+              {postUser?.name || "Anonymous hottie"}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {user?.username ? `@${user.username} • ` : "@default_user • "}
+              {postUser?.username
+                ? `@${postUser.username} • `
+                : "@default_user • "}
               {post?.createdAt
                 ? new Date(post.createdAt)
                     .toLocaleString("en-GB", formattedDate)
@@ -160,12 +213,21 @@ export default function PostCard({ post, isDetailsView, onRefetch }) {
           <button
             className="flex items-center gap-1.5 hover:text-red-500 transition-colors cursor-pointer"
             onClick={toggleLikePostHandler}
+            disabled={isLikeLoading}
+            aria-busy={isLikeLoading}
           >
-            <Heart
-              size={16}
-              fill={isLiked ? "currentColor" : "none"}
-              className={isLiked ? "text-red-500" : "text-gray-500"}
-            />
+            <span className="inline-flex w-4 h-4 items-center justify-center">
+              {isLikeLoading ? (
+                <Spinner size="sm" color="danger" />
+              ) : (
+                <Heart
+                  size={16}
+                  fill={isLiked ? "currentColor" : "none"}
+                  className={isLiked ? "text-red-500" : "text-gray-500"}
+                />
+              )}
+            </span>
+
             <span className={isLiked ? "text-red-500" : ""}>
               {likeCount || 0}
             </span>
@@ -184,11 +246,16 @@ export default function PostCard({ post, isDetailsView, onRefetch }) {
           </button>
         </div>
 
-        <button className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-pink-600 transition-colors">
-          {post?.bookmarked ? (
-            <BookmarkCheck size={16} />
+        <button
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-pink-600 cursor-pointer transition-colors"
+          onClick={toggleBookmarkPostHandler}
+          disabled={isBookmarkLoading}
+          aria-busy={isBookmarkLoading}
+        >
+          {isBookmarkLoading ? (
+            <Spinner size="sm" />
           ) : (
-            <Bookmark size={16} />
+            <Bookmark size={16} fill={isBookmarked ? "currentColor" : "none"} />
           )}
         </button>
       </CardFooter>

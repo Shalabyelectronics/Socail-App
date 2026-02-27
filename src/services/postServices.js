@@ -4,6 +4,7 @@ const newsFeedEndPoint = "/posts";
 const createPostEndPoint = "/posts";
 const postDetailsEndPoint = "/posts/";
 const userPostsEndPoint = "/posts/feed?only=me";
+const bookmarkedPostsEndPoint = "/posts/feed?only=bookmarks";
 export const newsFeedService = async (token, page = 1, limit = 10) => {
   const response = axios.get(BaseURL + newsFeedEndPoint, {
     headers: {
@@ -53,6 +54,20 @@ export const CreateUserPostsService = async (token, payLoad) => {
   return response;
 };
 
+export const bookmarkedFeedService = async (token, page = 1, limit = 10) => {
+  const response = axios.get(BaseURL + bookmarkedPostsEndPoint, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      page: page,
+      limit: limit,
+    },
+  });
+  return response;
+};
+
 export const sharePostService = async (token, postID, body) => {
   const response = axios.post(
     `${BaseURL}/posts/${postID}/share`,
@@ -78,8 +93,14 @@ export const likePostService = async (token, postID) => {
     },
   );
 };
-
-
-
-
-
+export const bookmarkPostService = async (token, postID) => {
+  return await axios.put(
+    `${BaseURL}/posts/${postID}/bookmark`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+};

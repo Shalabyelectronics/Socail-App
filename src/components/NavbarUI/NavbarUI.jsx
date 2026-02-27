@@ -14,13 +14,21 @@ import {
 } from "@heroui/react";
 import { LuMessageSquareHeart } from "react-icons/lu";
 import { FaBell } from "react-icons/fa";
+import { Bookmark } from "lucide-react";
 
 import socialAppLogo from "../../assets/auth/logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
+import { FeedContext } from "../FeedContext/FeedContextProvider";
 
 export default function NavbarUI() {
   const { setToken, user } = useContext(AuthContext);
+  const { bookmarkCount } = useContext(FeedContext);
+  const navigate = useNavigate();
+
+  const handleNavigateToBookmarks = () => {
+    navigate("/bookmarks");
+  };
   return (
     <Navbar maxWidth="xl">
       <NavbarBrand>
@@ -44,6 +52,16 @@ export default function NavbarUI() {
               <LuMessageSquareHeart className="size-[25px]" />
             </Badge>
           </div>
+          <button
+            type="button"
+            onClick={handleNavigateToBookmarks}
+            className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center hover:bg-gray-300 transition-colors"
+            aria-label="View bookmarked posts"
+          >
+            <Badge color="primary" content={bookmarkCount} size="md">
+              <Bookmark size={22} className="text-gray-700" />
+            </Badge>
+          </button>
         </NavbarContent>
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
