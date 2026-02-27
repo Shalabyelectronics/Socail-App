@@ -42,6 +42,12 @@ export default function NewsFeed() {
 
   useEffect(() => {
     const getPosts = async () => {
+      // Don't fetch if no token (user not logged in yet)
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
       if (currentPage === 1) setIsLoading(true);
       else setIsLoadingMore(true);
       try {
@@ -56,8 +62,11 @@ export default function NewsFeed() {
           );
         }
       } catch (error) {
-        console.error(error.response?.data.message || "Error fetching Posts");
-        toast.error(error.response?.data.message || "Error fetching Posts");
+        // Don't show toast for 401 errors (user will be redirected to login)
+        if (error.response?.status !== 401) {
+          console.error(error.response?.data.message || "Error fetching Posts");
+          toast.error(error.response?.data.message || "Error fetching Posts");
+        }
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
@@ -78,8 +87,11 @@ export default function NewsFeed() {
       const newsPosts = response.data.data.posts;
       setPosts(newsPosts);
     } catch (error) {
-      console.error(error.response?.data.message || "Error fetching Posts");
-      toast.error(error.response?.data.message || "Error fetching Posts");
+      // Don't show toast for 401 errors (user will be redirected to login)
+      if (error.response?.status !== 401) {
+        console.error(error.response?.data.message || "Error fetching Posts");
+        toast.error(error.response?.data.message || "Error fetching Posts");
+      }
     } finally {
       setIsLoading(false);
     }

@@ -11,12 +11,23 @@ export default function UserPosts() {
   const { token } = useContext(AuthContext);
 
   const refreshUserPosts = async () => {
+    // Don't fetch if no token (user not logged in yet)
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       const response = await getUserPostsService(token);
       setPosts(response.data.data.posts);
     } catch (error) {
-      console.error(error.response.data.message);
+      // Don't log 401 errors (user will be redirected to login)
+      if (error.response?.status !== 401) {
+        console.error(
+          error.response?.data?.message || "Error fetching user posts",
+        );
+      }
     } finally {
       setIsLoading(false);
     }

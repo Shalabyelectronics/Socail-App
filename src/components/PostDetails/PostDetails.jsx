@@ -24,12 +24,21 @@ export default function PostDetails() {
 
   useEffect(() => {
     const getPostDetails = async () => {
+      // Don't fetch if no token (user not logged in yet)
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
         const response = await postDetailsService(token, id);
         setPost(response.data.data.post);
       } catch (error) {
-        console.error(error);
+        // Don't log 401 errors (user will be redirected to login)
+        if (error.response?.status !== 401) {
+          console.error(error);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -39,7 +48,7 @@ export default function PostDetails() {
 
   useEffect(() => {
     const fetchComments = async () => {
-      if (!id) return;
+      if (!id || !token) return;
       try {
         setIsLoadingComments(true);
         const response = await getCommentsService(token, id, commentsPage, 2);
@@ -56,22 +65,28 @@ export default function PostDetails() {
           setHasMoreComments(false);
         }
       } catch (error) {
-        console.error("Error fetching comments:", error);
+        // Don't log 401 errors (user will be redirected to login)
+        if (error.response?.status !== 401) {
+          console.error("Error fetching comments:", error);
+        }
       } finally {
         setIsLoadingComments(false);
       }
     };
     fetchComments();
-  }, [token, id, commentsPage]);
-
-  const refreshComments = async () => {
-    if (!id) return;
+  }, [token || !token) return;
     try {
       setIsLoadingComments(true);
       const response = await getCommentsService(token, id, 1, 10);
       const newComments = response.data.data.comments;
       setComments(newComments);
       setCommentsPage(1);
+      setHasMoreComments(true);
+    } catch (error) {
+      // Don't log 401 errors (user will be redirected to login)
+      if (error.response?.status !== 401) {
+        console.error("Error refreshing comments:", error);
+      }
       setHasMoreComments(true);
     } catch (error) {
       console.error("Error refreshing comments:", error);

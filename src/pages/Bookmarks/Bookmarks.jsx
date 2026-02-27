@@ -44,6 +44,12 @@ export default function Bookmarks() {
 
   useEffect(() => {
     const getPosts = async () => {
+      // Don't fetch if no token (user not logged in yet)
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
       if (currentPage === 1) setIsLoading(true);
       else setIsLoadingMore(true);
       try {
@@ -68,8 +74,11 @@ export default function Bookmarks() {
           }
         }
       } catch (error) {
-        toast.error("Failed to load bookmarks");
-        console.error("Error fetching bookmarks:", error);
+        // Don't show toast for 401 errors (user will be redirected to login)
+        if (error.response?.status !== 401) {
+          toast.error("Failed to load bookmarks");
+          console.error("Error fetching bookmarks:", error);
+        }
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
