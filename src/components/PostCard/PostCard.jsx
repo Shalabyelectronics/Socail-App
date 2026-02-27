@@ -22,12 +22,20 @@ import { formattedDate } from "../../lib/tools";
 import CommentsList from "../CommentsList/CommentsList";
 import {
   bookmarkPostService,
+  deletePostService,
   likePostService,
   sharePostService,
 } from "../../services/postServices";
 import SharePostModal from "../SharePostModal/SharePostModal";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
+import UserPostSetting from "./../UserPostSetting/UserPostSetting";
+import DeletePostModal from "../DeletePostModal/DeletePostModal";
+import EditPostModal from "../EditPostModal/EditPostModal";
+import {
+  postDetailsService,
+  updatePostService,
+} from "../../services/postServices";
 
 export default function PostCard({
   post,
@@ -45,6 +53,14 @@ export default function PostCard({
   const [likeCount, setLikeCount] = useState(post?.likesCount || 0);
   const [isLikeLoading, setIsLikeLoading] = useState(false);
   const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const currentUserId = currentUser?.id || currentUser?._id;
+  const postOwnerId = post?.user?._id || post?.user?.id;
+  const isOwner = Boolean(
+    currentUserId && postOwnerId && currentUserId === postOwnerId,
+  );
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
     const userId = currentUser?.id || currentUser?._id;
@@ -58,7 +74,6 @@ export default function PostCard({
     try {
       await sharePostService(token, postId, body);
       toast.success("Post shared successfully!");
-      // Optional: refresh feed (pass a prop from parent like onRefetch)
       onRefetch?.();
     } catch (error) {
       // Handle specific error codes
@@ -126,6 +141,49 @@ export default function PostCard({
     }
   };
 
+  const handleDeleteConfirm = async () => {
+    if (isDeleteLoading) return;
+
+    setIsDeleteLoading(true);
+    try {
+      await deletePostService(token, post._id);
+      toast.success("Post deleted successfully ✅");
+
+      setIsDeleteOpen(false);
+
+      onRefetch?.();
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error(error.response?.data?.message || "Failed to delete post");
+    } finally {
+      setIsDeleteLoading(false);
+    }
+  };
+
+  const handleUpdate = async ({ postId, body, image, removeImage }) => {
+    try {
+      // Build payload for your update service
+      // If your backend supports removing image via empty string or specific field,
+      // adjust here.
+      const payload = {
+        body,
+        image,
+      };
+
+      // If you KNOW your API supports remove:
+      // payload.removeImage = removeImage;
+
+      await updatePostService(token, postId, payload);
+
+      toast.success("Post updated successfully ✅");
+      onRefetch?.();
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error(error.response?.data?.message || "Failed to update post");
+      throw error; // keeps modal consistent if you want to keep it open
+    }
+  };
+
   const postUser = post?.user || {};
 
   const showTopComment = post?.topComment ? [post.topComment] : [];
@@ -157,16 +215,27 @@ export default function PostCard({
             </p>
           </div>
         </div>
-
-        <Tooltip content={post?.privacy || "Unknown"}>
-          <span>
-            {(post?.privacy || "public") === "public" ? (
-              <Globe size={16} className="text-default-400" />
-            ) : (
-              <LockIcon size={16} className="text-default-400" />
-            )}
-          </span>
-        </Tooltip>
+        <div className="flex gap-1.5 items-center">
+          <Tooltip content={post?.privacy || "Unknown"}>
+            <span>
+              {(post?.privacy || "public") === "public" ? (
+                <Globe size={16} className="text-default-400" />
+              ) : (
+                <LockIcon size={16} className="text-default-400" />
+              )}
+            </span>
+          </Tooltip>
+          <Tooltip content={"Edit/delete your post"}>
+            <span>
+              {isOwner && (
+                <UserPostSetting
+                  onEdit={() => setIsEditOpen(true)}
+                  onDelete={() => setIsDeleteOpen(true)}
+                />
+              )}
+            </span>
+          </Tooltip>
+        </div>
       </CardHeader>
 
       <Divider />
@@ -276,6 +345,20 @@ export default function PostCard({
         onClose={() => setIsShareOpen(false)}
         onShare={handleShare}
         post={post}
+      />
+      <DeletePostModal
+        isOpen={isDeleteOpen}
+        onClose={() => !isDeleteLoading && setIsDeleteOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleteLoading}
+      />
+      <EditPostModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        postId={post._id}
+        token={token}
+        fetchPostDetails={postDetailsService}
+        onUpdate={handleUpdate}
       />
     </Card>
   );
