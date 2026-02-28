@@ -33,3 +33,20 @@ export const getUserProfileService = async (token) => {
 
   return response;
 };
+
+export const changePasswordService = async (token, payload) => {
+  const response = axios.patch(
+    `${BaseURL}/users/change-password`,
+    {
+      password: payload.password,
+      newPassword: payload.newPassword,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return response;
+};

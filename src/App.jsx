@@ -13,6 +13,9 @@ import AppProtectedRoutes from "./components/ProtectedRoutes/AppProtectedRoutes.
 import AuthProtextedRoutes from "./components/ProtectedRoutes/AuthProtextedRoutes.jsx";
 import AuthContextProvider from "./components/AuthContext/AuthContextProvider.jsx";
 import PostDetails from "./components/PostDetails/PostDetails.jsx";
+import Settings from "./pages/Settings/Settings.jsx";
+import UpdateProfileImage from "./components/UpdateProfileImage/UpdateProfileImage.jsx";
+import ChangePassword from "./components/ChangePassword/ChangePassword.jsx";
 
 function App() {
   const routes = createBrowserRouter([
@@ -51,6 +54,28 @@ function App() {
               <PostDetails />
             </AppProtectedRoutes>
           ),
+        },
+        {
+          path: "setting",
+          element: (
+            <AppProtectedRoutes>
+              <Settings />
+            </AppProtectedRoutes>
+          ),
+          children: [
+            {
+              index: true,
+              element: <UpdateProfileImage />,
+            },
+            {
+              path: "update-profile-image",
+              element: <UpdateProfileImage />,
+            },
+            {
+              path: "change-password",
+              element: <ChangePassword />,
+            },
+          ],
         },
         { path: "*", element: <NotFound /> },
       ],

@@ -7,6 +7,6 @@
 
 @layer utilities {
   .container {
-    @apply w-[80%] mx-auto mt-4;
+    @apply max-w-7xl w-full mx-auto px-6 mt-4;
   }
 }

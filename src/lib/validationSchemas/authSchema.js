@@ -18,7 +18,7 @@ export const registerSchema = z
       .string()
       .nonempty("Password is required")
       .min(4, "Password not less than 4 digts")
-      .max(8, "Password not exceed 8 digits"),
+      .max(10, "Password not exceed 10 digits"),
     rePassword: z.string().nonempty("Password is required"),
     dateOfBirth: z.preprocess(
       (value) =>
@@ -46,5 +46,22 @@ export const loginSchema = z.object({
     .string()
     .nonempty("Password is required")
     .min(4, "Password not less than 4 digts")
-    .max(8, "Password not exceed 8 digits"),
+    .max(10, "Password not exceed 10 digits"),
 });
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().nonempty("Current password is required."),
+    password: z
+      .string()
+      .nonempty("New password is required.")
+      .regex(
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        "Your password must be at least 8 characters and include: 1 uppercase, 1 lowercase, 1 number, and 1 special character.",
+      ),
+    rePassword: z.string().nonempty("Password confirmation is required."),
+  })
+  .refine((data) => data.password === data.rePassword, {
+    path: ["rePassword"],
+    message: "Passwords do not match.",
+  });

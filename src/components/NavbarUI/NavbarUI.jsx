@@ -86,6 +86,11 @@ export default function NavbarUI() {
                 {user?.email || "user@example.com"}
               </p>
             </DropdownItem>
+            <DropdownItem key="setting">
+              <Link className="w-full block" to="/setting">
+                Setting
+              </Link>
+            </DropdownItem>
             <DropdownItem key="profile">
               <Link className="w-full block" to="/profile">
                 My Profile
