@@ -20,6 +20,7 @@ export default function PostDetails() {
   const [commentsPage, setCommentsPage] = useState(1);
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [isLoadingMoreComments, setIsLoadingMoreComments] = useState(false);
   const [isLoadingCreateCommet, setIsLoadingCreateCommet] = useState(false);
 
   useEffect(() => {
@@ -50,7 +51,13 @@ export default function PostDetails() {
     const fetchComments = async () => {
       if (!id || !token) return;
       try {
-        setIsLoadingComments(true);
+        // Use different loading state based on whether it's initial load or loading more
+        if (commentsPage === 1) {
+          setIsLoadingComments(true);
+        } else {
+          setIsLoadingMoreComments(true);
+        }
+
         const response = await getCommentsService(token, id, commentsPage, 2);
         const newComments = response.data.data.comments;
 
@@ -71,6 +78,7 @@ export default function PostDetails() {
         }
       } finally {
         setIsLoadingComments(false);
+        setIsLoadingMoreComments(false);
       }
     };
     fetchComments();
@@ -136,23 +144,26 @@ export default function PostDetails() {
                 <Spinner size="md" />
               </div>
             ) : (
-              <CommentsList
-                comments={comments}
-                postID={id}
-                onRefetch={refreshComments}
-                isDetailsView={true}
-              />
-            )}
-            {hasMoreComments && !isLoadingComments && (
-              <Button
-                size="sm"
-                variant="flat"
-                color="secondary"
-                onClick={() => setCommentsPage((prev) => prev + 1)}
-                className="w-full mt-4"
-              >
-                Load More Comments
-              </Button>
+              <>
+                <CommentsList
+                  comments={comments}
+                  postID={id}
+                  onRefetch={refreshComments}
+                  isDetailsView={true}
+                  isLoadingMore={isLoadingMoreComments}
+                />
+                {hasMoreComments && !isLoadingMoreComments && (
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    color="secondary"
+                    onClick={() => setCommentsPage((prev) => prev + 1)}
+                    className="w-full mt-4"
+                  >
+                    Load More Comments
+                  </Button>
+                )}
+              </>
             )}
           </div>
 
