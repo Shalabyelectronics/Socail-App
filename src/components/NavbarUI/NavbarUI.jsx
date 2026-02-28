@@ -33,7 +33,7 @@ export default function NavbarUI() {
     <Navbar maxWidth="xl">
       <NavbarBrand>
         <img src={socialAppLogo} alt="Socail App logo" width={90} />
-        <p className="font-bold text-inherit">Social App</p>
+        <p className="hidden md:block font-bold text-inherit">Social App</p>
       </NavbarBrand>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
@@ -44,12 +44,12 @@ export default function NavbarUI() {
         <NavbarContent justify="end">
           <div className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center ">
             <Badge color="primary" content="5" size="md">
-              <FaBell className="size-[25px]" />
+              <FaBell className="size-[20px] sm:size-[22px]" />
             </Badge>
           </div>
           <div className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center ">
             <Badge color="primary" content="5" size="md">
-              <LuMessageSquareHeart className="size-[25px]" />
+              <LuMessageSquareHeart className="text-gray-700 size-[20px] sm:size-[22px]" />
             </Badge>
           </div>
           <button
