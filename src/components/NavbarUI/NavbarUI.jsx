@@ -22,7 +22,7 @@ import { AuthContext } from "../AuthContext/AuthContextProvider";
 import { FeedContext } from "../FeedContext/FeedContextProvider";
 
 export default function NavbarUI() {
-  const { setToken, user } = useContext(AuthContext);
+  const { setToken, user, userPhoto } = useContext(AuthContext);
   const { bookmarkCount } = useContext(FeedContext);
   const navigate = useNavigate();
 
@@ -73,7 +73,7 @@ export default function NavbarUI() {
                 color="secondary"
                 name={user?.name || "User"}
                 size="sm"
-                src={user.photo}
+                src={userPhoto}
               />
             ) : (
               <Skeleton className="w-8 h-8 rounded-full" />

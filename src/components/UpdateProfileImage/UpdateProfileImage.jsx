@@ -1,10 +1,24 @@
-import React, { useState, useRef } from "react";
-import { Card, CardHeader, CardBody, CardFooter, Button, Avatar } from "@heroui/react";
+import React, { useState, useRef, useContext } from "react";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Button,
+  Avatar,
+  Skeleton,
+} from "@heroui/react";
 import { Camera, Upload, X } from "lucide-react";
+import { AuthContext } from "../AuthContext/AuthContextProvider";
+import { uploadProfileImageService } from "../../services/authServices";
+import { toast } from "react-toastify";
 
-export default function UpdateProfileImage({ currentUser }) {
+export default function UpdateProfileImage() {
+  const { token, userPhoto, setUserPhoto } = useContext(AuthContext);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(currentUser?.photo || "https://via.placeholder.com/150?text=User");
+  const [previewUrl, setPreviewUrl] = useState(
+    userPhoto || "https://via.placeholder.com/150?text=User",
+  );
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -18,7 +32,7 @@ export default function UpdateProfileImage({ currentUser }) {
 
   const handleRemoveImage = () => {
     setSelectedFile(null);
-    setPreviewUrl(currentUser?.photo || "https://via.placeholder.com/150?text=User");
+    setPreviewUrl(userPhoto || "https://via.placeholder.com/150?text=User");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -30,9 +44,14 @@ export default function UpdateProfileImage({ currentUser }) {
 
     setIsLoading(true);
     try {
-      console.log("Profile image updated");
+      const response = await uploadProfileImageService(token, {
+        photo: selectedFile,
+      });
+      toast.success("Profile photo uploaded successfully ✅");
+      setUserPhoto(response.data.data.photo);
     } catch (error) {
       console.error(error);
+      toast.error("There is error uploading a photo! ⚠️");
     } finally {
       setIsLoading(false);
       setSelectedFile(null);
@@ -56,10 +75,15 @@ export default function UpdateProfileImage({ currentUser }) {
       <form onSubmit={handleSubmit}>
         <CardBody className="flex flex-col items-center gap-6 py-6 px-8">
           <div className="relative group">
-            <Avatar
-              src={previewUrl}
-              className="w-32 h-32 text-large ring-4 ring-[#5E17EB]/20 ring-offset-4 dark:ring-offset-gray-900"
-            />
+            {isLoading ? (
+              <Skeleton className="flex rounded-full w-32 h-32" />
+            ) : (
+              <Avatar
+                src={previewUrl}
+                className="w-32 h-32 text-large ring-4 ring-[#5E17EB]/20 ring-offset-4 dark:ring-offset-gray-900"
+              />
+            )}
+
             {selectedFile && (
               <button
                 type="button"

@@ -5,6 +5,7 @@ export const AuthContext = createContext();
 export default function AuthContextProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("userToken"));
   const [user, setUser] = useState(null);
+  const [userPhoto, setUserPhoto] = useState(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
 
   useEffect(() => {
@@ -21,8 +22,9 @@ export default function AuthContextProvider({ children }) {
     const fetchUserProfile = async () => {
       try {
         const response = await getUserProfileService(token);
-       
+
         setUser(response.data.data.user);
+        setUserPhoto(response.data.data.user.photo);
       } catch (error) {
         console.error("Error fetching user profile:", error);
         setUser(null);
@@ -42,7 +44,9 @@ export default function AuthContextProvider({ children }) {
   }, [token, isAuthReady]);
 
   return (
-    <AuthContext.Provider value={{ token, setToken, user, isAuthReady }}>
+    <AuthContext.Provider
+      value={{ token, setToken, user, userPhoto, setUserPhoto, isAuthReady }}
+    >
       {children}
     </AuthContext.Provider>
   );

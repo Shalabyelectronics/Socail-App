@@ -50,3 +50,17 @@ export const changePasswordService = async (token, payload) => {
   );
   return response;
 };
+
+export const uploadProfileImageService = async (token, payload) => {
+  const data = new FormData();
+  if (payload.photo) {
+    data.append("photo", payload.photo);
+  }
+
+  const response = await axios.put(`${BaseURL}/users/upload-photo`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};
