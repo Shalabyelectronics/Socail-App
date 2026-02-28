@@ -206,17 +206,19 @@ export default function PostCard({
             <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
               {postUser?.name || "Anonymous hottie"}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {postUser?.username
-                ? `@${postUser.username} • `
-                : "@default_user • "}
-              {post?.createdAt
-                ? new Date(post.createdAt)
-                    .toLocaleString("en-GB", formattedDate)
-                    .replace(/\//g, "-")
-                    .replace(", ", " | ")
-                : "Just now"}
-            </p>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              <p>
+                {postUser?.username ? `@${postUser.username}` : "@default_user"}
+              </p>
+              <p className="text-[10px] md:text-sm mt-1">
+                {post?.createdAt
+                  ? new Date(post.createdAt)
+                      .toLocaleString("en-GB", formattedDate)
+                      .replace(/\//g, "-")
+                      .replace(", ", " | ")
+                  : "Just now"}
+              </p>
+            </div>
           </div>
         </div>
         <div className="flex gap-1.5 items-center">

@@ -21,7 +21,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 import { FeedContext } from "../FeedContext/FeedContextProvider";
 import { NotificationsContext } from "../NotificationsContext/NotificationsProvider";
-
 export default function NavbarUI() {
   const { setToken, user, userPhoto } = useContext(AuthContext);
   const { unreadCount } = useContext(NotificationsContext);
@@ -29,17 +28,19 @@ export default function NavbarUI() {
   const navigate = useNavigate();
 
   const handleNavigateToBookmarks = () => {
-    navigate("/bookmarks");
+    navigate("/bookmarks", { replace: true });
   };
   const handleNavigateToNotifications = () => {
     navigate("/notifications", { replace: true });
   };
   return (
     <Navbar maxWidth="xl">
-      <NavbarBrand>
-        <img src={socialAppLogo} alt="Socail App logo" width={90} />
-        <p className="hidden md:block font-bold text-inherit">Social App</p>
-      </NavbarBrand>
+      <Link to="/" className="cursor-pointer">
+        <NavbarBrand>
+          <img src={socialAppLogo} alt="Socail App logo" width={90} />
+          <p className="hidden md:block font-bold text-inherit">Social App</p>
+        </NavbarBrand>
+      </Link>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <Input fullWidth={true} label="Search" radius="full" className="" />
