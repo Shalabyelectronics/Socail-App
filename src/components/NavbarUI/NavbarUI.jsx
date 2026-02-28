@@ -20,14 +20,19 @@ import socialAppLogo from "../../assets/auth/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 import { FeedContext } from "../FeedContext/FeedContextProvider";
+import { NotificationsContext } from "../NotificationsContext/NotificationsProvider";
 
 export default function NavbarUI() {
   const { setToken, user, userPhoto } = useContext(AuthContext);
+  const { unreadCount } = useContext(NotificationsContext);
   const { bookmarkCount } = useContext(FeedContext);
   const navigate = useNavigate();
 
   const handleNavigateToBookmarks = () => {
     navigate("/bookmarks");
+  };
+  const handleNavigateToNotifications = () => {
+    navigate("/notifications", { replace: true });
   };
   return (
     <Navbar maxWidth="xl">
@@ -42,11 +47,16 @@ export default function NavbarUI() {
 
       <NavbarContent as="div" justify="end">
         <NavbarContent justify="end">
-          <div className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center ">
-            <Badge color="primary" content="5" size="md">
+          <button
+            type="button"
+            onClick={handleNavigateToNotifications}
+            aria-label="view notifications page"
+            className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center "
+          >
+            <Badge color="primary" content={unreadCount} size="md">
               <FaBell className="size-[20px] sm:size-[22px]" />
             </Badge>
-          </div>
+          </button>
           <div className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center ">
             <Badge color="primary" content="5" size="md">
               <LuMessageSquareHeart className="text-gray-700 size-[20px] sm:size-[22px]" />

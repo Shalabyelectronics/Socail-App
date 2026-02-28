@@ -23,7 +23,7 @@ export default function PostCreation({ onCreatePost }) {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const { token, user } = useContext(AuthContext);
+  const { token, user, userPhoto } = useContext(AuthContext);
 
   const fileInputRef = useRef(null);
 
@@ -89,7 +89,7 @@ export default function PostCreation({ onCreatePost }) {
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <Avatar
-                src={user?.photo || "https://via.placeholder.com/80?text=😏"}
+                src={userPhoto || "https://via.placeholder.com/80?text=😏"}
                 alt={user?.name || "User"}
                 size="md"
                 className="ring-2 ring-[#5E17EB] ring-offset-2 flex-shrink-0"

@@ -16,6 +16,8 @@ import PostDetails from "./components/PostDetails/PostDetails.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import UpdateProfileImage from "./components/UpdateProfileImage/UpdateProfileImage.jsx";
 import ChangePassword from "./components/ChangePassword/ChangePassword.jsx";
+import NotificationsProvider from "./components/NotificationsContext/NotificationsProvider.jsx";
+import Notifications from "./pages/Notifications/Notifications.jsx";
 
 function App() {
   const routes = createBrowserRouter([
@@ -36,6 +38,14 @@ function App() {
           element: (
             <AppProtectedRoutes>
               <Bookmarks />
+            </AppProtectedRoutes>
+          ),
+        },
+        {
+          path: "notifications",
+          element: (
+            <AppProtectedRoutes>
+              <Notifications />
             </AppProtectedRoutes>
           ),
         },
@@ -107,8 +117,10 @@ function App() {
   return (
     <>
       <AuthContextProvider>
-        <ToastContainer />
-        <RouterProvider router={routes} />
+        <NotificationsProvider>
+          <ToastContainer />
+          <RouterProvider router={routes} />
+        </NotificationsProvider>
       </AuthContextProvider>
     </>
   );
