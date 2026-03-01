@@ -140,8 +140,8 @@ export default function PostCreation({ onCreatePost }) {
 
         <Divider />
 
-        <CardFooter className="px-5 py-3 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
-          <div className="flex items-center gap-3">
+        <CardFooter className="px-5 py-3 flex flex-wrap justify-between items-center gap-2 bg-gray-50 dark:bg-gray-900/50">
+          <div className="flex items-center gap-2 sm:gap-3">
             <input
               type="file"
               accept="image/*"
@@ -151,17 +151,17 @@ export default function PostCreation({ onCreatePost }) {
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 text-[#5E17EB] hover:text-[#FF3131] font-medium px-3 py-2 rounded-lg hover:bg-[#5E17EB]/10 transition-colors"
+              className="flex items-center gap-1 sm:gap-2 text-[#5E17EB] hover:text-[#FF3131] font-medium px-2 sm:px-3 py-2 rounded-lg hover:bg-[#5E17EB]/10 transition-colors"
             >
               <ImageIcon size={20} />
-              <span className="text-sm">Photo</span>
+              <span className="text-sm hidden sm:inline">Photo</span>
             </button>
 
             <Select
               size="sm"
               selectedKeys={[privacy]}
               onChange={(e) => setPrivacy(e.target.value)}
-              className="w-40"
+              className="w-32 sm:w-36 md:w-40"
               aria-label="Post privacy"
               startContent={
                 privacy === "public" ? (
