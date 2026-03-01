@@ -369,13 +369,19 @@ export default function UserProfile() {
                   </span>
                   <span className="text-sm text-gray-500">Posts</span>
                 </div>
-                <div className="flex flex-col">
+                <div
+                  className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => navigate(`/followers/${id}`)}
+                >
                   <span className="font-bold text-lg text-gray-900 dark:text-white">
                     {userProfile.followersCount || 0}
                   </span>
                   <span className="text-sm text-gray-500">Followers</span>
                 </div>
-                <div className="flex flex-col">
+                <div
+                  className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => navigate(`/following/${id}`)}
+                >
                   <span className="font-bold text-lg text-gray-900 dark:text-white">
                     {userProfile.followingCount || 0}
                   </span>

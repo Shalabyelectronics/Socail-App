@@ -6,16 +6,26 @@ import {
 } from "../../services/userServices";
 import { getUserProfileService } from "../../services/authServices";
 import { Spinner, Card, CardHeader, Avatar, Button } from "@heroui/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Users } from "lucide-react";
+import { Users, ArrowLeft } from "lucide-react";
 
 export default function Following() {
+  const { userId } = useParams(); // Get userId from URL params
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [followingStatuses, setFollowingStatuses] = useState({});
-  const { token, refreshUserProfile } = useContext(AuthContext);
+  const [targetUserName, setTargetUserName] = useState("");
+  const {
+    token,
+    user: currentUser,
+    refreshUserProfile,
+  } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Determine if viewing own profile or another user's
+  const isOwnProfile =
+    !userId || userId === currentUser?.id || userId === currentUser?._id;
 
   useEffect(() => {
     const getUsers = async () => {
@@ -27,9 +37,25 @@ export default function Following() {
       setIsLoading(true);
 
       try {
-        // Get current user's profile data which includes following array
-        const profileResponse = await getUserProfileService(token);
-        const followingArray = profileResponse.data.data.user.following || [];
+        let followingArray = [];
+        let targetUser = null;
+
+        if (isOwnProfile) {
+          // Get current user's profile data which includes following array
+          const profileResponse = await getUserProfileService(token);
+          followingArray = profileResponse.data.data.user.following || [];
+          setTargetUserName("You"); // Display "You" for own profile
+        } else {
+          // Get specified user's profile data
+          const profileResponse = await getUserPublicProfileService(
+            token,
+            userId,
+          );
+          targetUser =
+            profileResponse.data.data.user || profileResponse.data.data;
+          followingArray = targetUser.following || [];
+          setTargetUserName(targetUser.name); // Display the user's name
+        }
 
         if (followingArray.length === 0) {
           setUsers([]);
@@ -40,16 +66,25 @@ export default function Following() {
         // Fetch each followed user's profile data
         const invalidUserIds = [];
         const userProfiles = await Promise.all(
-          followingArray.map(async (userId) => {
+          followingArray.map(async (followUserItem) => {
+            // Extract ID whether it's an object or a string
+            const followUserId =
+              typeof followUserItem === "object"
+                ? followUserItem._id || followUserItem.id
+                : followUserItem;
+
             try {
-              const response = await getUserPublicProfileService(token, userId);
+              const response = await getUserPublicProfileService(
+                token,
+                followUserId,
+              );
               return response.data.data.user;
             } catch (error) {
               // If user not found (404), mark for cleanup
               if (error.response?.status === 404) {
-                invalidUserIds.push(userId);
+                invalidUserIds.push(followUserId);
               } else {
-                console.error(`Failed to fetch user ${userId}:`, error);
+                console.error(`Failed to fetch user ${followUserId}:`, error);
               }
               return null;
             }
@@ -60,11 +95,23 @@ export default function Following() {
         const validUsers = userProfiles.filter((user) => user !== null);
         setUsers(validUsers);
 
-        // Initialize following statuses (all should be true)
+        // Initialize following statuses
+        // If viewing own profile, all should be true (we're following them)
+        // If viewing another user's profile, check if we're following each user
         const statuses = {};
-        validUsers.forEach((user) => {
-          statuses[user._id] = true;
-        });
+        if (isOwnProfile) {
+          validUsers.forEach((user) => {
+            statuses[user._id] = true;
+          });
+        } else {
+          // Check localStorage to see who we're following
+          const followedUsers = JSON.parse(
+            localStorage.getItem("followedUsers") || "{}",
+          );
+          validUsers.forEach((user) => {
+            statuses[user._id] = !!followedUsers[user._id];
+          });
+        }
         setFollowingStatuses(statuses);
       } catch (error) {
         toast.error("Failed to load following list");
@@ -75,27 +122,32 @@ export default function Following() {
     };
 
     getUsers();
-  }, [token]);
+  }, [token, userId, isOwnProfile]);
 
-  const handleFollowClick = async (userId) => {
+  const handleFollowClick = async (userIdToFollow) => {
     try {
-      const response = await followUserService(token, userId);
+      const response = await followUserService(token, userIdToFollow);
       const { following: newFollowStatus } = response.data.data;
 
-      setFollowingStatuses((prev) => ({ ...prev, [userId]: newFollowStatus }));
+      setFollowingStatuses((prev) => ({
+        ...prev,
+        [userIdToFollow]: newFollowStatus,
+      }));
 
       // Update localStorage
       const followedUsers = JSON.parse(
         localStorage.getItem("followedUsers") || "{}",
       );
       if (newFollowStatus) {
-        followedUsers[userId] = true;
+        followedUsers[userIdToFollow] = true;
       } else {
-        delete followedUsers[userId];
-        // Remove from list if unfollowed
-        setUsers((prevUsers) =>
-          prevUsers.filter((user) => user._id !== userId),
-        );
+        delete followedUsers[userIdToFollow];
+        // Only remove from list if viewing own profile and unfollowing
+        if (isOwnProfile) {
+          setUsers((prevUsers) =>
+            prevUsers.filter((user) => user._id !== userIdToFollow),
+          );
+        }
       }
       localStorage.setItem("followedUsers", JSON.stringify(followedUsers));
 
@@ -112,6 +164,14 @@ export default function Following() {
       toast.error(
         error.response?.data?.message || "Failed to update follow status",
       );
+    }
+  };
+
+  const handleBack = () => {
+    if (userId) {
+      navigate(`/users/${userId}`);
+    } else {
+      navigate(-1);
     }
   };
 
@@ -142,9 +202,22 @@ export default function Following() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto p-4">
+      {/* Back Button */}
+      <Button
+        startContent={<ArrowLeft size={18} />}
+        variant="light"
+        onPress={handleBack}
+        className="mb-4"
+      >
+        Back to Profile
+      </Button>
+
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
-        Following ({users.length})
+        {targetUserName === "You"
+          ? "People You Follow"
+          : `${targetUserName}'s Following`}{" "}
+        ({users.length})
       </h1>
       <div className="flex flex-col gap-3">
         {users.map((user) => (
@@ -153,17 +226,18 @@ export default function Following() {
             className="p-4 hover:shadow-lg transition-shadow"
           >
             <CardHeader className="flex justify-between items-center p-0">
-              <div
-                className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity flex-1"
-                onClick={() => navigate(`/users/${user._id}`)}
-              >
+              <div className="flex items-center gap-3 flex-1">
                 <Avatar
                   src={user.photo || "https://placehold.co/80x80?text=User"}
                   alt={user.name}
                   size="lg"
-                  className="ring-2 ring-pink-500 ring-offset-2"
+                  className="ring-2 ring-pink-500 ring-offset-2 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => navigate(`/users/${user._id}`)}
                 />
-                <div>
+                <div
+                  className="cursor-pointer hover:opacity-80 transition-opacity flex-1"
+                  onClick={() => navigate(`/users/${user._id}`)}
+                >
                   <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
                     {user.name}
                   </h3>

@@ -54,7 +54,23 @@ function App() {
           ),
         },
         {
+          path: "following/:userId",
+          element: (
+            <AppProtectedRoutes>
+              <Following />
+            </AppProtectedRoutes>
+          ),
+        },
+        {
           path: "followers",
+          element: (
+            <AppProtectedRoutes>
+              <Followers />
+            </AppProtectedRoutes>
+          ),
+        },
+        {
+          path: "followers/:userId",
           element: (
             <AppProtectedRoutes>
               <Followers />
