@@ -11,8 +11,10 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  Select,
+  SelectItem,
 } from "@heroui/react";
-import { Image as ImageIcon, X, Send } from "lucide-react";
+import { Image as ImageIcon, X, Send, Globe, Users, Lock } from "lucide-react";
 import { CreateUserPostsService } from "../../services/postServices";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 import { toast } from "react-toastify";
@@ -23,6 +25,7 @@ export default function PostCreation({ onCreatePost }) {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [privacy, setPrivacy] = useState("public");
   const { token, user, userPhoto } = useContext(AuthContext);
 
   const fileInputRef = useRef(null);
@@ -62,6 +65,7 @@ export default function PostCreation({ onCreatePost }) {
     setBody("");
     handleRemoveImage();
     setIsModalOpen(false);
+    setPrivacy("public");
   };
 
   const handleSubmit = async () => {
@@ -71,6 +75,7 @@ export default function PostCreation({ onCreatePost }) {
       await CreateUserPostsService(token, {
         body,
         image: selectedFile,
+        privacy,
       });
       resetForm();
       onCreatePost?.();
@@ -136,7 +141,7 @@ export default function PostCreation({ onCreatePost }) {
         <Divider />
 
         <CardFooter className="px-5 py-3 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
-          <div>
+          <div className="flex items-center gap-3">
             <input
               type="file"
               accept="image/*"
@@ -151,6 +156,45 @@ export default function PostCreation({ onCreatePost }) {
               <ImageIcon size={20} />
               <span className="text-sm">Photo</span>
             </button>
+
+            <Select
+              size="sm"
+              selectedKeys={[privacy]}
+              onChange={(e) => setPrivacy(e.target.value)}
+              className="w-40"
+              aria-label="Post privacy"
+              startContent={
+                privacy === "public" ? (
+                  <Globe size={16} />
+                ) : privacy === "following" ? (
+                  <Users size={16} />
+                ) : (
+                  <Lock size={16} />
+                )
+              }
+            >
+              <SelectItem
+                key="public"
+                value="public"
+                startContent={<Globe size={16} />}
+              >
+                Public
+              </SelectItem>
+              <SelectItem
+                key="following"
+                value="following"
+                startContent={<Users size={16} />}
+              >
+                Followers
+              </SelectItem>
+              <SelectItem
+                key="only_me"
+                value="only_me"
+                startContent={<Lock size={16} />}
+              >
+                Only Me
+              </SelectItem>
+            </Select>
           </div>
 
           <Button

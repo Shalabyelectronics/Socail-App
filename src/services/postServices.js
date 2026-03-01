@@ -46,6 +46,9 @@ export const CreateUserPostsService = async (token, payLoad) => {
   if (payLoad.image) {
     data.append("image", payLoad.image);
   }
+  if (payLoad.privacy) {
+    data.append("privacy", payLoad.privacy);
+  }
   const response = axios.post(BaseURL + createPostEndPoint, data, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -123,6 +126,7 @@ export const updatePostService = async (token, postID, payload) => {
   const data = new FormData();
   if (payload.body) data.append("body", payload.body);
   if (payload.image) data.append("image", payload.image);
+  if (payload.privacy) data.append("privacy", payload.privacy);
   const response = axios.put(`${BaseURL}/posts/${postID}`, data, {
     headers: {
       Authorization: `Bearer ${token}`,

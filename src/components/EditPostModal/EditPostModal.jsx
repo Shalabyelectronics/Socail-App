@@ -8,7 +8,10 @@ import {
   Button,
   Textarea,
   Spinner,
+  Select,
+  SelectItem,
 } from "@heroui/react";
+import { Globe, Users, Lock } from "lucide-react";
 
 export default function EditPostModal({
   isOpen,
@@ -25,6 +28,7 @@ export default function EditPostModal({
   const [serverImageUrl, setServerImageUrl] = useState("");
   const [newImageFile, setNewImageFile] = useState(null);
   const [removeImage, setRemoveImage] = useState(false);
+  const [privacy, setPrivacy] = useState("public");
 
   const newImagePreview = useMemo(() => {
     if (!newImageFile) return "";
@@ -48,6 +52,7 @@ export default function EditPostModal({
         // Adjust this depending on your API shape
         const data = res?.data?.data?.post || setBody(data?.body || "");
         setServerImageUrl(data?.image || "");
+        setPrivacy(data?.privacy || "public");
         setNewImageFile(null);
         setRemoveImage(false);
       } catch (err) {
@@ -85,6 +90,7 @@ export default function EditPostModal({
         body,
         image: newImageFile,
         removeImage,
+        privacy,
       });
       onClose?.();
     } catch (err) {
@@ -122,6 +128,45 @@ export default function EditPostModal({
                     minRows={4}
                     className="w-full"
                   />
+
+                  {/* Privacy selector */}
+                  <Select
+                    label="Privacy"
+                    selectedKeys={[privacy]}
+                    onChange={(e) => setPrivacy(e.target.value)}
+                    className="w-full"
+                    startContent={
+                      privacy === "public" ? (
+                        <Globe size={16} />
+                      ) : privacy === "following" ? (
+                        <Users size={16} />
+                      ) : (
+                        <Lock size={16} />
+                      )
+                    }
+                  >
+                    <SelectItem
+                      key="public"
+                      value="public"
+                      startContent={<Globe size={16} />}
+                    >
+                      Public
+                    </SelectItem>
+                    <SelectItem
+                      key="following"
+                      value="following"
+                      startContent={<Users size={16} />}
+                    >
+                      Followers
+                    </SelectItem>
+                    <SelectItem
+                      key="only_me"
+                      value="only_me"
+                      startContent={<Lock size={16} />}
+                    >
+                      Only Me
+                    </SelectItem>
+                  </Select>
 
                   {/* Image preview area - styled similar to PostCard */}
                   {(showExistingImage || newImagePreview) && (

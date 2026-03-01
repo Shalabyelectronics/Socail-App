@@ -17,6 +17,7 @@ import {
   Bookmark,
   Globe,
   LockIcon,
+  Users,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formattedDate } from "../../lib/tools";
@@ -223,7 +224,13 @@ export default function PostCard({
     }
   };
 
-  const handleUpdate = async ({ postId, body, image, removeImage }) => {
+  const handleUpdate = async ({
+    postId,
+    body,
+    image,
+    removeImage,
+    privacy,
+  }) => {
     try {
       // Build payload for your update service
       // If your backend supports removing image via empty string or specific field,
@@ -231,6 +238,7 @@ export default function PostCard({
       const payload = {
         body,
         image,
+        privacy,
       };
 
       // If you KNOW your API supports remove:
@@ -295,12 +303,26 @@ export default function PostCard({
               {isFollowing ? "Following" : "Follow"}
             </Button>
           )}
-          <Tooltip content={post?.privacy || "Unknown"}>
+          <Tooltip
+            content={
+              post?.privacy === "public"
+                ? "Public"
+                : post?.privacy === "following"
+                  ? "Followers Only"
+                  : post?.privacy === "only_me"
+                    ? "Only Me"
+                    : "Unknown"
+            }
+          >
             <span>
-              {(post?.privacy || "public") === "public" ? (
-                <Globe size={16} className="text-default-400" />
+              {post?.privacy === "public" ? (
+                <Globe size={16} className="text-blue-500" />
+              ) : post?.privacy === "following" ? (
+                <Users size={16} className="text-green-500" />
+              ) : post?.privacy === "only_me" ? (
+                <LockIcon size={16} className="text-orange-500" />
               ) : (
-                <LockIcon size={16} className="text-default-400" />
+                <Globe size={16} className="text-default-400" />
               )}
             </span>
           </Tooltip>
