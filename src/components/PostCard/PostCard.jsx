@@ -271,6 +271,32 @@ export default function PostCard({
   };
 
   const showTopComment = post?.topComment ? [post.topComment] : [];
+  const textPostBackgrounds = [
+    "bg-gradient-to-br from-violet-600 to-purple-600",
+    "bg-gradient-to-br from-pink-500 to-rose-600",
+    "bg-gradient-to-br from-blue-500 to-indigo-600",
+    "bg-gradient-to-br from-cyan-500 to-blue-600",
+    "bg-gradient-to-br from-emerald-500 to-teal-600",
+    "bg-gradient-to-br from-orange-500 to-red-500",
+    "bg-gradient-to-br from-fuchsia-500 to-purple-600",
+    "bg-gradient-to-br from-slate-600 to-gray-800",
+  ];
+
+  const getStableBackgroundClass = (postId) => {
+    const idAsString = String(postId || "fallback");
+    let hash = 0;
+
+    for (let index = 0; index < idAsString.length; index += 1) {
+      hash = (hash * 31 + idAsString.charCodeAt(index)) >>> 0;
+    }
+
+    return textPostBackgrounds[hash % textPostBackgrounds.length];
+  };
+
+  const isTextOnlyPost = Boolean(post?.body && !post?.image);
+  const textPostBackgroundClass = getStableBackgroundClass(
+    post?._id || post?.id,
+  );
 
   return (
     <Card className="w-full shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 mb-4">
@@ -357,10 +383,20 @@ export default function PostCard({
       <Divider />
 
       <CardBody className="px-5 py-4">
-        {post?.body && (
+        {post?.body && !isTextOnlyPost && (
           <p className="text-gray-800 dark:text-gray-200 mb-4 leading-relaxed">
             {post.body}
           </p>
+        )}
+
+        {isTextOnlyPost && (
+          <div
+            className={`mb-4 rounded-2xl min-h-52 md:min-h-64 flex items-center justify-center p-6 md:p-10 ${textPostBackgroundClass}`}
+          >
+            <p className="text-white text-lg md:text-2xl font-semibold leading-relaxed text-center whitespace-pre-wrap break-words">
+              {post.body}
+            </p>
+          </div>
         )}
 
         {post?.image && (
