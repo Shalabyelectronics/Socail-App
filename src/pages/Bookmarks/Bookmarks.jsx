@@ -90,7 +90,7 @@ export default function Bookmarks() {
   return (
     <div className="flex flex-col gap-4">
       {posts.length === 0 ? (
-        <NoPosts message="No bookmarked posts yet. Start bookmarking posts to see them here!" />
+        <NoPosts message="No bookmarked posts yet. Start bookmarking posts to see them here!" routeToLink={"/"} routeToMessage={"Go to newsFeed"} />
       ) : (
         <>
           {posts.map((post, index) => (

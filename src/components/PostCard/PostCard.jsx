@@ -8,6 +8,7 @@ import {
   Tooltip,
   Divider,
   Spinner,
+  Button,
 } from "@heroui/react";
 import {
   Heart,
@@ -26,6 +27,7 @@ import {
   likePostService,
   sharePostService,
 } from "../../services/postServices";
+import { followUserService } from "../../services/userServices";
 import SharePostModal from "../SharePostModal/SharePostModal";
 import { toast } from "react-toastify";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
@@ -63,6 +65,8 @@ export default function PostCard({
     currentUserId && postOwnerId && currentUserId === postOwnerId,
   );
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   useEffect(() => {
     const userId = currentUser?.id || currentUser?._id;
@@ -70,6 +74,13 @@ export default function PostCard({
     setIsLiked(userId ? likes.includes(userId) : false);
     setLikeCount(post?.likesCount ?? likes.length ?? 0);
     setIsBookmarked(Boolean(post?.bookmarked));
+
+    // Check localStorage for follow status since API doesn't return it in posts feed
+    const followedUsers = JSON.parse(
+      localStorage.getItem("followedUsers") || "{}",
+    );
+    const postUserId = post?.user?._id || post?.user?.id;
+    setIsFollowing(Boolean(followedUsers[postUserId]));
   }, [post, currentUser]);
 
   const handleShare = async ({ postId, body }) => {
@@ -145,6 +156,47 @@ export default function PostCard({
     }
   };
 
+  const postUser = post?.user || {};
+
+  const handleFollowClick = async () => {
+    if (followLoading || !postUser?._id) return;
+    setFollowLoading(true);
+    try {
+      const response = await followUserService(token, postUser._id);
+      const { following: newFollowStatus } = response.data.data;
+
+      // Update state
+      setIsFollowing(newFollowStatus);
+
+      // Update localStorage to persist follow status
+      const followedUsers = JSON.parse(
+        localStorage.getItem("followedUsers") || "{}",
+      );
+      const postUserId = postUser._id || postUser.id;
+
+      if (newFollowStatus) {
+        followedUsers[postUserId] = true;
+      } else {
+        delete followedUsers[postUserId];
+      }
+
+      localStorage.setItem("followedUsers", JSON.stringify(followedUsers));
+
+      toast.success(
+        newFollowStatus
+          ? `You are now following ${postUser.name} 🎉`
+          : `You unfollowed ${postUser.name}`,
+      );
+    } catch (error) {
+      console.error("Follow error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to update follow status",
+      );
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
   const handleDeleteConfirm = async () => {
     if (isDeleteLoading) return;
 
@@ -188,14 +240,15 @@ export default function PostCard({
     }
   };
 
-  const postUser = post?.user || {};
-
   const showTopComment = post?.topComment ? [post.topComment] : [];
 
   return (
     <Card className="w-full shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 mb-4">
       <CardHeader className="flex justify-between items-center px-5 pt-5 pb-3">
-        <div className="flex items-center gap-3">
+        <div
+          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => navigate(`/users/${postUser._id || postUser.id}`)}
+        >
           <Avatar
             src={postUser?.photo || "https://placehold.co/80x80?text=User"}
             alt={postUser?.name || "User"}
@@ -222,6 +275,19 @@ export default function PostCard({
           </div>
         </div>
         <div className="flex gap-1.5 items-center">
+          {!isOwner && (
+            <Button
+              size="sm"
+              color={isFollowing ? "default" : "primary"}
+              variant={isFollowing ? "bordered" : "solid"}
+              onPress={handleFollowClick}
+              isLoading={followLoading}
+              isDisabled={followLoading}
+              className="mr-2"
+            >
+              {isFollowing ? "Following" : "Follow"}
+            </Button>
+          )}
           <Tooltip content={post?.privacy || "Unknown"}>
             <span>
               {(post?.privacy || "public") === "public" ? (

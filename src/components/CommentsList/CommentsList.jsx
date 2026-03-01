@@ -143,7 +143,14 @@ export default function CommentsList({
             <div className="flex flex-col w-full">
               <div className="bg-gray-100 dark:bg-gray-800/80 p-3 rounded-2xl rounded-tl-sm border border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-sm text-gray-900 dark:text-white">
+                  <span
+                    className="font-bold text-sm text-gray-900 dark:text-white cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() =>
+                      navigate(
+                        `/users/${comment.commentCreator?._id || comment.commentCreator?.id}`,
+                      )
+                    }
+                  >
                     {comment.commentCreator?.name || "Anonymous"}
                   </span>
                   <div className="flex items-center gap-2">

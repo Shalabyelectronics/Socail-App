@@ -14,7 +14,7 @@ import {
 } from "@heroui/react";
 import { LuMessageSquareHeart } from "react-icons/lu";
 import { FaBell } from "react-icons/fa";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Users } from "lucide-react";
 
 import socialAppLogo from "../../assets/auth/logo.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -41,10 +41,10 @@ export default function NavbarUI() {
           <p className="hidden md:block font-bold text-inherit">Social App</p>
         </NavbarBrand>
       </Link>
-
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      {/* Maybe later I can Activate this feature to let user search about posts  */}
+      {/* <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <Input fullWidth={true} label="Search" radius="full" className="" />
-      </NavbarContent>
+      </NavbarContent> */}
 
       <NavbarContent as="div" justify="end">
         <NavbarContent justify="end">
@@ -73,6 +73,41 @@ export default function NavbarUI() {
               <Bookmark size={22} className="text-gray-700" />
             </Badge>
           </button>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <button
+                type="button"
+                className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center hover:bg-gray-300 transition-colors"
+                aria-label="View connections"
+              >
+                <Users size={22} className="text-gray-700" />
+              </button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Connections" variant="flat">
+              <DropdownItem key="following">
+                <Link
+                  className="w-full flex items-center justify-between gap-3"
+                  to="/following"
+                >
+                  <span>Following</span>
+                  <span className="bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300 px-2 py-0.5 rounded-full text-xs font-semibold">
+                    {user?.followingCount || 0}
+                  </span>
+                </Link>
+              </DropdownItem>
+              <DropdownItem key="followers">
+                <Link
+                  className="w-full flex items-center justify-between gap-3"
+                  to="/followers"
+                >
+                  <span>Followers</span>
+                  <span className="bg-secondary-100 text-secondary-700 dark:bg-secondary-900 dark:text-secondary-300 px-2 py-0.5 rounded-full text-xs font-semibold">
+                    {user?.followersCount || 0}
+                  </span>
+                </Link>
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </NavbarContent>
         <Dropdown placement="bottom-end">
           <DropdownTrigger>

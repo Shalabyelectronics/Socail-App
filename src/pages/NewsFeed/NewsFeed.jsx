@@ -12,6 +12,7 @@ import PostCard from "../../components/PostCard/PostCard";
 import NoPosts from "../../components/NoPosts/NoPosts";
 import { toast } from "react-toastify";
 import PostCreation from "./../../components/PostCreation/PostCreation";
+import FollowSuggestions from "../../components/FollowSuggestions/FollowSuggestions";
 
 export default function NewsFeed() {
   const [posts, setPosts] = useState([]);
@@ -112,6 +113,7 @@ export default function NewsFeed() {
   return (
     <div className="flex flex-col items-center w-full mx-auto">
       <PostCreation currentUser={user} onCreatePost={refreshPosts} />
+      <FollowSuggestions onFollowSuccess={refreshPosts} />
       {posts.map((post, index) => {
         // 6. Check if this is the very last post in the current array
         if (posts.length === index + 1) {
