@@ -9,6 +9,8 @@ import {
   Divider,
   Spinner,
   Button,
+  Modal,
+  ModalContent,
 } from "@heroui/react";
 import {
   Heart,
@@ -72,6 +74,19 @@ export default function PostCard({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [previewImageUrl, setPreviewImageUrl] = useState("");
+
+  const handleOpenImagePreview = (imageUrl) => {
+    if (!imageUrl) return;
+    setPreviewImageUrl(imageUrl);
+    setIsImagePreviewOpen(true);
+  };
+
+  const handleCloseImagePreview = () => {
+    setIsImagePreviewOpen(false);
+    setPreviewImageUrl("");
+  };
 
   useEffect(() => {
     const userId = currentUser?.id || currentUser?._id;
@@ -349,13 +364,18 @@ export default function PostCard({
         )}
 
         {post?.image && (
-          <div className="rounded-lg overflow-hidden mb-4 border border-gray-200 dark:border-gray-700">
+          <button
+            type="button"
+            onClick={() => handleOpenImagePreview(post.image)}
+            className="w-full rounded-lg overflow-hidden mb-4 border border-gray-200 dark:border-gray-700 cursor-zoom-in"
+            aria-label="Preview full post image"
+          >
             <img
               src={post.image}
               alt="post media"
               className="w-full h-auto max-h-[500px] object-cover hover:scale-[1.02] transition-transform duration-500"
             />
-          </div>
+          </button>
         )}
 
         {post?.isShare && post?.sharedPost && (
@@ -368,11 +388,18 @@ export default function PostCard({
               <p className="mb-3">{post.sharedPost.body}</p>
             )}
             {post.sharedPost?.image && (
-              <img
-                src={post.sharedPost.image}
-                alt="shared media"
-                className="rounded-lg max-h-64 object-cover"
-              />
+              <button
+                type="button"
+                onClick={() => handleOpenImagePreview(post.sharedPost.image)}
+                className="rounded-lg max-h-64 overflow-hidden cursor-zoom-in"
+                aria-label="Preview full shared post image"
+              >
+                <img
+                  src={post.sharedPost.image}
+                  alt="shared media"
+                  className="rounded-lg max-h-64 object-cover"
+                />
+              </button>
             )}
           </div>
         )}
@@ -461,6 +488,34 @@ export default function PostCard({
         fetchPostDetails={postDetailsService}
         onUpdate={handleUpdate}
       />
+
+      <Modal
+        isOpen={isImagePreviewOpen}
+        onClose={handleCloseImagePreview}
+        size="5xl"
+        backdrop="blur"
+      >
+        <ModalContent>
+          <div className="relative bg-black/95 rounded-xl p-2 md:p-4 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={handleCloseImagePreview}
+              className="absolute top-3 right-3 z-10 bg-white/90 text-black rounded-full w-8 h-8 flex items-center justify-center hover:bg-white"
+              aria-label="Close image preview"
+            >
+              ✕
+            </button>
+
+            {previewImageUrl && (
+              <img
+                src={previewImageUrl}
+                alt="Full post preview"
+                className="w-full h-auto max-h-[85vh] object-contain rounded-lg"
+              />
+            )}
+          </div>
+        </ModalContent>
+      </Modal>
     </Card>
   );
 }

@@ -14,7 +14,7 @@ import {
 } from "@heroui/react";
 import { LuMessageSquareHeart } from "react-icons/lu";
 import { FaBell } from "react-icons/fa";
-import { Bookmark, Users } from "lucide-react";
+import { Bookmark, Users, House } from "lucide-react";
 
 import socialAppLogo from "../../assets/auth/logo.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -34,6 +34,9 @@ export default function NavbarUI() {
   const handleNavigateToNotifications = () => {
     navigate("/notifications", { replace: true });
   };
+  const handleNavigateToHome = () => {
+    navigate("/", { replace: true });
+  };
   return (
     <Navbar maxWidth="xl">
       <Link to="/" className="cursor-pointer">
@@ -49,6 +52,14 @@ export default function NavbarUI() {
 
       <NavbarContent as="div" justify="end">
         <NavbarContent justify="end">
+          <button
+            type="button"
+            onClick={handleNavigateToHome}
+            aria-label="Go to news feed"
+            className="bg-gray-200 rounded-full size-10 cursor-pointer flex justify-center items-center hover:bg-gray-300 transition-colors"
+          >
+            <House size={22} className="text-gray-700" />
+          </button>
           <button
             type="button"
             onClick={handleNavigateToNotifications}

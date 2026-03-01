@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Avatar, Divider, Skeleton } from "@heroui/react";
+import { Avatar, Divider, Skeleton, Modal, ModalContent } from "@heroui/react";
 import { Heart, MessageSquare } from "lucide-react";
 import CommentReplyCreation from "../CommentReplyForm/CommentReplyForm";
 import {
@@ -35,6 +35,20 @@ export default function CommentsList({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [previewImageUrl, setPreviewImageUrl] = useState("");
+
+  const handleOpenImagePreview = (imageUrl) => {
+    if (!imageUrl) return;
+    setPreviewImageUrl(imageUrl);
+    setIsImagePreviewOpen(true);
+  };
+
+  const handleCloseImagePreview = () => {
+    setIsImagePreviewOpen(false);
+    setPreviewImageUrl("");
+  };
+
   if (!comments || comments.length === 0) {
     return (
       <div className="text-gray-500 text-sm py-4 text-center italic">
@@ -138,7 +152,7 @@ export default function CommentsList({
               }
               alt={comment.commentCreator?.name || "User"}
               size="sm"
-              className="ring-2 ring-[#5E17EB] ring-offset-1 flex-shrink-0 mt-1 cursor-pointer hover:opacity-80 transition-opacity"
+              className="ring-2 ring-[#5E17EB] ring-offset-1 shrink-0 mt-1 cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() =>
                 navigate(
                   `/users/${comment.commentCreator?._id || comment.commentCreator?.id}`,
@@ -179,13 +193,18 @@ export default function CommentsList({
 
                 {/* Comment Image */}
                 {comment.image && (
-                  <div className="mt-2 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenImagePreview(comment.image)}
+                    className="mt-2 w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 cursor-zoom-in"
+                    aria-label="Preview full comment image"
+                  >
                     <img
                       src={comment.image}
                       alt="comment media"
                       className="w-full max-h-60 object-cover"
                     />
-                  </div>
+                  </button>
                 )}
               </div>
 
@@ -300,7 +319,7 @@ export default function CommentsList({
           {[1, 2].map((skeleton) => (
             <div key={`skeleton-${skeleton}`} className="flex flex-col gap-1.5">
               <div className="flex gap-3 items-start">
-                <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
+                <Skeleton className="w-10 h-10 rounded-full shrink-0" />
                 <div className="flex flex-col w-full gap-2">
                   <Skeleton className="w-32 h-4 rounded-lg" />
                   <div className="bg-gray-100 dark:bg-gray-800/80 p-3 rounded-2xl rounded-tl-sm border border-gray-200 dark:border-gray-700 space-y-2">
@@ -344,6 +363,34 @@ export default function CommentsList({
         onConfirm={confirmDeleteComment}
         isLoading={isDeleting}
       />
+
+      <Modal
+        isOpen={isImagePreviewOpen}
+        onClose={handleCloseImagePreview}
+        size="5xl"
+        backdrop="blur"
+      >
+        <ModalContent>
+          <div className="relative bg-black/95 rounded-xl p-2 md:p-4 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={handleCloseImagePreview}
+              className="absolute top-3 right-3 z-10 bg-white/90 text-black rounded-full w-8 h-8 flex items-center justify-center hover:bg-white"
+              aria-label="Close image preview"
+            >
+              ✕
+            </button>
+
+            {previewImageUrl && (
+              <img
+                src={previewImageUrl}
+                alt="Full comment preview"
+                className="w-full h-auto max-h-[85vh] object-contain rounded-lg"
+              />
+            )}
+          </div>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

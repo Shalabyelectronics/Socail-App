@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Avatar, Divider, Spinner, Skeleton } from "@heroui/react";
+import {
+  Avatar,
+  Divider,
+  Spinner,
+  Skeleton,
+  Modal,
+  ModalContent,
+} from "@heroui/react";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 import { getRepliesService } from "../../services/commentsServices";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +21,19 @@ export default function CommentRepliesList({
   const navigate = useNavigate();
   const [replies, setReplies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [previewImageUrl, setPreviewImageUrl] = useState("");
+
+  const handleOpenImagePreview = (imageUrl) => {
+    if (!imageUrl) return;
+    setPreviewImageUrl(imageUrl);
+    setIsImagePreviewOpen(true);
+  };
+
+  const handleCloseImagePreview = () => {
+    setIsImagePreviewOpen(false);
+    setPreviewImageUrl("");
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -74,13 +94,18 @@ export default function CommentRepliesList({
                 )}
 
                 {reply.image && (
-                  <div className="mt-2 rounded-lg overflow-hidden border">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenImagePreview(reply.image)}
+                    className="mt-2 w-full rounded-lg overflow-hidden border cursor-zoom-in"
+                    aria-label="Preview full reply image"
+                  >
                     <img
                       src={reply.image}
                       alt="reply media"
                       className="w-full max-h-48 object-cover"
                     />
-                  </div>
+                  </button>
                 )}
               </div>
             </div>
@@ -89,7 +114,7 @@ export default function CommentRepliesList({
           {/* Skeleton Loader for New Reply */}
           {isLoadingReply && (
             <div className="flex gap-3 items-start">
-              <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
+              <Skeleton className="w-10 h-10 rounded-full shrink-0" />
               <div className="flex flex-col w-full gap-2">
                 <div className="bg-gray-100 dark:bg-gray-800/80 p-3 rounded-2xl rounded-tl-sm border border-gray-200 dark:border-gray-700 w-full space-y-2">
                   <Skeleton className="w-24 h-4 rounded-lg" />
@@ -103,6 +128,34 @@ export default function CommentRepliesList({
       )}
 
       <Divider className="my-2 ml-6 w-[calc(100%-2rem)]" />
+
+      <Modal
+        isOpen={isImagePreviewOpen}
+        onClose={handleCloseImagePreview}
+        size="5xl"
+        backdrop="blur"
+      >
+        <ModalContent>
+          <div className="relative bg-black/95 rounded-xl p-2 md:p-4 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={handleCloseImagePreview}
+              className="absolute top-3 right-3 z-10 bg-white/90 text-black rounded-full w-8 h-8 flex items-center justify-center hover:bg-white"
+              aria-label="Close image preview"
+            >
+              ✕
+            </button>
+
+            {previewImageUrl && (
+              <img
+                src={previewImageUrl}
+                alt="Full reply preview"
+                className="w-full h-auto max-h-[85vh] object-contain rounded-lg"
+              />
+            )}
+          </div>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
