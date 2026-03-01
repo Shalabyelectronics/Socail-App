@@ -124,7 +124,7 @@ export default function UserPosts() {
                 "https://via.placeholder.com/120"
               }
               alt={userProfile?.name || currentUser?.name}
-              className="w-32 h-32 text-large ring-4 ring-white dark:ring-gray-800"
+              className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 text-large ring-4 ring-white dark:ring-gray-800 shrink-0"
             />
 
             {/* User Info */}
