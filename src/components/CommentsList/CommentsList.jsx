@@ -369,6 +369,7 @@ export default function CommentsList({
         onClose={handleCloseImagePreview}
         size="5xl"
         backdrop="blur"
+        placement="center"
       >
         <ModalContent>
           <div className="relative bg-black/95 rounded-xl p-2 md:p-4 flex items-center justify-center">

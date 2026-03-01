@@ -260,10 +260,10 @@ export default function UserProfile() {
         <img
           src={
             userProfile.cover ||
-            "https://placehold.co/1200x300/5E17EB/FFFFFF?text=Cover+Photo"
+            "https://placehold.co/800x200/5E17EB/FFFFFF?text=Cover+Photo"
           }
           alt="Cover photo"
-          className="w-full h-48 object-cover"
+          className="w-full h-32 sm:h-40 md:h-48 object-cover"
         />
 
         {/* Edit Icon Overlay (Only for own profile) */}
@@ -287,7 +287,7 @@ export default function UserProfile() {
             <Avatar
               src={userProfile.photo || "https://via.placeholder.com/120"}
               alt={userProfile.name}
-              className="w-32 h-32 text-large ring-4 ring-white dark:ring-gray-800"
+              className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 text-large ring-4 ring-white dark:ring-gray-800 shrink-0"
             />
 
             {/* User Info */}
