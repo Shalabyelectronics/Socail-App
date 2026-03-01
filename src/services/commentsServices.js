@@ -82,11 +82,45 @@ export const createCommentReplyService = async (
   return response;
 };
 
-
 export const likeCommentService = async (token, postID, commentID) => {
   return await axios.put(
     `${BaseURL}/posts/${postID}/comments/${commentID}/like`,
     {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+};
+
+export const updateCommentService = async (
+  token,
+  postID,
+  commentID,
+  payLoad,
+) => {
+  const data = new FormData();
+  if (payLoad.content) {
+    data.append("content", payLoad.content);
+  }
+  if (payLoad.image) {
+    data.append("image", payLoad.image);
+  }
+  return await axios.put(
+    `${BaseURL}/posts/${postID}/comments/${commentID}`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+};
+
+export const deleteCommentService = async (token, postID, commentID) => {
+  return await axios.delete(
+    `${BaseURL}/posts/${postID}/comments/${commentID}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

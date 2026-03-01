@@ -5,11 +5,15 @@ import CommentReplyCreation from "../CommentReplyForm/CommentReplyForm";
 import {
   createCommentReplyService,
   likeCommentService,
+  deleteCommentService,
 } from "../../services/commentsServices";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 import CommentRepliesList from "../CommentRepliesList/CommentRepliesList";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import EditCommentModal from "../EditCommentModal/EditCommentModal";
+import DeleteCommentModal from "../DeleteCommentModal/DeleteCommentModal";
+import CommentSettings from "../CommentSettings/CommentSettings";
 
 export default function CommentsList({
   comments,
@@ -25,6 +29,12 @@ export default function CommentsList({
   const [likedByCommentId, setLikedByCommentId] = useState({});
   const [likeCountByCommentId, setLikeCountByCommentId] = useState({});
   const navigate = useNavigate();
+
+  // Modal states for edit/delete
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedComment, setSelectedComment] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   if (!comments || comments.length === 0) {
     return (
       <div className="text-gray-500 text-sm py-4 text-center italic">
@@ -78,6 +88,44 @@ export default function CommentsList({
     }
   };
 
+  // Check if user is the owner of a comment
+  const isCommentOwner = (comment) => {
+    const userId = user?.id || user?._id;
+    const creatorId = comment.commentCreator?._id || comment.commentCreator?.id;
+    return userId && creatorId && userId === creatorId;
+  };
+
+  // Handle edit comment
+  const handleEditComment = (comment) => {
+    setSelectedComment(comment);
+    setEditModalOpen(true);
+  };
+
+  // Handle delete comment
+  const handleDeleteComment = (comment) => {
+    setSelectedComment(comment);
+    setDeleteModalOpen(true);
+  };
+
+  // Confirm delete
+  const confirmDeleteComment = async () => {
+    if (!selectedComment) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteCommentService(token, postID, selectedComment._id);
+      toast.success("Comment deleted successfully! 🗑️");
+      setDeleteModalOpen(false);
+      setSelectedComment(null);
+      onRefetch?.(); // Refresh comments list
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+      toast.error(error.response?.data?.message || "Failed to delete comment");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="w-full flex flex-col gap-4 mt-2 px-1">
       {comments.map((comment, index) => (
@@ -98,9 +146,17 @@ export default function CommentsList({
                   <span className="font-bold text-sm text-gray-900 dark:text-white">
                     {comment.commentCreator?.name || "Anonymous"}
                   </span>
-                  <span className="text-[11px] text-gray-500 font-medium">
-                    {formatCommentDate(comment.createdAt)}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-gray-500 font-medium">
+                      {formatCommentDate(comment.createdAt)}
+                    </span>
+                    {isCommentOwner(comment) && (
+                      <CommentSettings
+                        onEdit={() => handleEditComment(comment)}
+                        onDelete={() => handleDeleteComment(comment)}
+                      />
+                    )}
+                  </div>
                 </div>
                 {/* Comment Text */}
                 {comment.content && (
@@ -250,6 +306,32 @@ export default function CommentsList({
           ))}
         </>
       )}
+
+      {/* Edit Comment Modal */}
+      <EditCommentModal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedComment(null);
+        }}
+        comment={selectedComment}
+        postId={postID}
+        token={token}
+        onUpdate={() => {
+          onRefetch?.(); // Refresh comments list after edit
+        }}
+      />
+
+      {/* Delete Comment Modal */}
+      <DeleteCommentModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setSelectedComment(null);
+        }}
+        onConfirm={confirmDeleteComment}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }
