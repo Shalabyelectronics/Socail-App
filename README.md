@@ -105,43 +105,43 @@ A modern social media web app built with React, Vite, HeroUI, and Tailwind CSS.
 ### 1) Auth Screens
 
 - [ ] Login page with validation message (friendly text)
-  - Screenshot: `TODO_add_screenshot_login_validation.png`
+  ![alt text](image-1.png)
 - [ ] Register page responsive layout (mobile view)
-  - Screenshot: `TODO_add_screenshot_register_mobile.png`
+  ![alt text](image-2.png)
 
 ### 2) Feed & Post Features
 
 - [ ] Create post with privacy selector open
-  - Screenshot: `TODO_add_screenshot_post_privacy_selector.png`
+  ![alt text](image-3.png)
 - [ ] Feed card showing privacy icon tooltip
-  - Screenshot: `TODO_add_screenshot_post_privacy_icon.png`
+  ![alt text](image-4.png)
 - [ ] Text-only post rendered as styled gradient card
-  - Screenshot: `TODO_add_screenshot_text_only_post_card.png`
+  ![alt text](image-5.png)
 - [ ] Full-image preview modal for a post image
-  - Screenshot: `TODO_add_screenshot_post_image_preview_modal.png`
+  ![alt text](image-6.png)
 
 ### 3) Comments & Replies
 
 - [ ] Comment image thumbnail + full-image preview modal
-  - Screenshot: `TODO_add_screenshot_comment_image_preview.png`
+  ![alt text](image-7.png)
 - [ ] Reply image thumbnail + full-image preview modal
-  - Screenshot: `TODO_add_screenshot_reply_image_preview.png`
+  ![alt text](image-8.png)
 
 ### 4) Profile & Social Graph
 
 - [ ] Public user profile (`/users/:id`) with cover + follow button
-  - Screenshot: `TODO_add_screenshot_public_user_profile.png`
+  ![alt text](image-9.png)
 - [ ] My profile (`/profile`) with cover + profile details + stats
-  - Screenshot: `TODO_add_screenshot_my_profile_facebook_style.png`
+  ![alt text](image-10.png)
 - [ ] Followers page and following page with back navigation
-  - Screenshot: `TODO_add_screenshot_followers_following_pages.png`
+  ![alt text](image-11.png)
 
 ### 5) Navbar & Navigation
 
 - [ ] Navbar showing Home button + notification/bookmark badges
-  - Screenshot: `TODO_add_screenshot_navbar_home_badges.png`
+ ![alt text](image-12.png)
 - [ ] Navbar loading state with skeleton badges on refresh
-  - Screenshot: `TODO_add_screenshot_navbar_skeleton_badges.png`
+  ![alt text](image-13.png)
 
 ## Known Notes
 
