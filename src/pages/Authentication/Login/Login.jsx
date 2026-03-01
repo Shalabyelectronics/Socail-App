@@ -9,6 +9,7 @@ import { Input, Button } from "@heroui/react";
 import { loginService } from "../../../services/authServices";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../../components/AuthContext/AuthContextProvider";
+import { formatErrorMessage } from "../../../lib/tools";
 
 export default function Login() {
   const [isShowPass, setIsShowPass] = useState(false);
@@ -20,7 +21,7 @@ export default function Login() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {
       email: "",
       password: "",
@@ -35,55 +36,60 @@ export default function Login() {
       setToken(response.data.data.token);
       navigate("/profile");
     } catch (error) {
-      
-      toast.error(error.response.data.message);
+      const errorMessage =
+        error.response?.data?.message || "An error occurred during login";
+      toast.error(formatErrorMessage(errorMessage));
     }
   };
   return (
     <>
-      <h2 className="text-3xl font-bold my-2">
-        Welcome to Our Socail Media Login Form
+      <h2 className="text-2xl md:text-3xl font-bold mb-2">
+        Welcome to Our Social Media Login Form
       </h2>
-      <p className="text-gray-500 text-lg font-semibold my-2">
+      <p className="text-gray-500 text-base md:text-lg font-semibold mb-6">
         Please Fill In This Form To Login
       </p>
-      <form onSubmit={handleSubmit(submit)} className="max-w-4xl mx-auto">
-        <div className="form-body md:w-[90%] lg:w-[70%] mb-8">
-          <Input
-            {...register("email")}
-            label="Email"
-            isInvalid={!!errors.email}
-            errorMessage={errors.email?.message}
-            type="email"
-            variant="bordered"
-            className="pb-4"
-            classNames={{ inputWrapper: errors.email ? "border-red-600" : "" }}
-          />
-          <Input
-            {...register("password")}
-            isInvalid={!!errors.password}
-            errorMessage={errors.password?.message}
-            label="Password"
-            type={isShowPass ? "text" : "password"}
-            variant="bordered"
-            className="pb-4"
-            endContent={
-              isShowPass ? (
-                <LuEyeClosed
-                  className="cursor-pointer text-[1.5rem] text-gray-500 hover:text-gray-700 transition-colors duration-300"
-                  onClick={() => setIsShowPass(!isShowPass)}
-                />
-              ) : (
-                <LuEye
-                  className="cursor-pointer text-[1.5rem] text-gray-500 hover:text-gray-700 transition-colors duration-300"
-                  onClick={() => setIsShowPass(!isShowPass)}
-                />
-              )
-            }
-            classNames={{
-              innerWrapper: errors.password ? "border-red-600" : "",
-            }}
-          />
+      <form onSubmit={handleSubmit(submit)} className="w-full">
+        <div className="form-body w-full mb-8">
+          <div className="min-h-[90px]">
+            <Input
+              {...register("email")}
+              label="Email"
+              isInvalid={!!errors.email}
+              errorMessage={errors.email?.message}
+              type="email"
+              variant="bordered"
+              classNames={{
+                inputWrapper: errors.email ? "border-red-600" : "",
+              }}
+            />
+          </div>
+          <div className="min-h-[90px]">
+            <Input
+              {...register("password")}
+              isInvalid={!!errors.password}
+              errorMessage={errors.password?.message}
+              label="Password"
+              type={isShowPass ? "text" : "password"}
+              variant="bordered"
+              endContent={
+                isShowPass ? (
+                  <LuEyeClosed
+                    className="cursor-pointer text-[1.5rem] text-gray-500 hover:text-gray-700 transition-colors duration-300"
+                    onClick={() => setIsShowPass(!isShowPass)}
+                  />
+                ) : (
+                  <LuEye
+                    className="cursor-pointer text-[1.5rem] text-gray-500 hover:text-gray-700 transition-colors duration-300"
+                    onClick={() => setIsShowPass(!isShowPass)}
+                  />
+                )
+              }
+              classNames={{
+                innerWrapper: errors.password ? "border-red-600" : "",
+              }}
+            />
+          </div>
 
           <Button
             type="submit"
@@ -94,7 +100,7 @@ export default function Login() {
           </Button>
         </div>
       </form>
-      <p className="text-center pb-4 md:w-[90%] lg:w-[70%]">
+      <p className="text-center text-sm md:text-base pb-4">
         Please register if you do not have an account?{" "}
         <Link className="text-blue-600 font-semibold" to="/register">
           Register
