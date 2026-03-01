@@ -26,6 +26,7 @@ export default function NavbarUI() {
   const { unreadCount, isUnreadCountLoading } =
     useContext(NotificationsContext);
   const { bookmarkCount, isBookmarkCountLoading } = useContext(FeedContext);
+  const isProfileLoading = !user;
   const navigate = useNavigate();
 
   const handleNavigateToBookmarks = () => {
@@ -112,7 +113,11 @@ export default function NavbarUI() {
                 >
                   <span>Following</span>
                   <span className="bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300 px-2 py-0.5 rounded-full text-xs font-semibold">
-                    {user?.followingCount || 0}
+                    {isProfileLoading ? (
+                      <Skeleton className="w-6 h-3 rounded" />
+                    ) : (
+                      user?.followingCount || 0
+                    )}
                   </span>
                 </Link>
               </DropdownItem>
@@ -123,7 +128,11 @@ export default function NavbarUI() {
                 >
                   <span>Followers</span>
                   <span className="bg-secondary-100 text-secondary-700 dark:bg-secondary-900 dark:text-secondary-300 px-2 py-0.5 rounded-full text-xs font-semibold">
-                    {user?.followersCount || 0}
+                    {isProfileLoading ? (
+                      <Skeleton className="w-6 h-3 rounded" />
+                    ) : (
+                      user?.followersCount || 0
+                    )}
                   </span>
                 </Link>
               </DropdownItem>
@@ -132,7 +141,7 @@ export default function NavbarUI() {
         </NavbarContent>
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
-            {user?.photo ? (
+            {!isProfileLoading ? (
               <Avatar
                 isBordered
                 as="button"
@@ -149,9 +158,7 @@ export default function NavbarUI() {
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             <DropdownItem key="user email account" className="h-14 gap-2">
               <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">
-                {user?.email || "user@example.com"}
-              </p>
+              <p className="font-semibold">{user?.email || "Loading..."}</p>
             </DropdownItem>
             <DropdownItem key="setting">
               <Link className="w-full block" to="/setting">

@@ -393,7 +393,7 @@ export default function PostCard({
           <div
             className={`mb-4 rounded-2xl min-h-52 md:min-h-64 flex items-center justify-center p-6 md:p-10 ${textPostBackgroundClass}`}
           >
-            <p className="text-white text-lg md:text-2xl font-semibold leading-relaxed text-center whitespace-pre-wrap break-words">
+            <p className="text-white text-lg md:text-2xl font-semibold leading-relaxed text-center whitespace-pre-wrap wrap-break-word">
               {post.body}
             </p>
           </div>
@@ -409,7 +409,7 @@ export default function PostCard({
             <img
               src={post.image}
               alt="post media"
-              className="w-full h-auto max-h-[500px] object-cover hover:scale-[1.02] transition-transform duration-500"
+              className="w-full h-auto max-h-125 object-cover hover:scale-[1.02] transition-transform duration-500"
             />
           </button>
         )}
