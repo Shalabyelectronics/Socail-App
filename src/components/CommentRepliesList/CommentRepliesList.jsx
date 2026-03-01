@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { Avatar, Divider, Spinner, Skeleton } from "@heroui/react";
 import { AuthContext } from "../AuthContext/AuthContextProvider";
 import { getRepliesService } from "../../services/commentsServices";
+import { useNavigate } from "react-router-dom";
 
 export default function CommentRepliesList({
   postId,
@@ -10,6 +11,7 @@ export default function CommentRepliesList({
   isLoadingReply,
 }) {
   const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [replies, setReplies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,7 +51,12 @@ export default function CommentRepliesList({
                   "https://via.placeholder.com/40"
                 }
                 size="sm"
-                className="ring-2 ring-[#5E17EB] ring-offset-1"
+                className="ring-2 ring-[#5E17EB] ring-offset-1 cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() =>
+                  navigate(
+                    `/users/${reply.commentCreator?._id || reply.commentCreator?.id}`,
+                  )
+                }
               />
 
               <div className="bg-gray-100 dark:bg-gray-800/80 p-3 rounded-2xl rounded-tl-sm border border-gray-200 dark:border-gray-700 w-full">
