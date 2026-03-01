@@ -19,20 +19,22 @@ export default function AuthContextProvider({ children }) {
       return;
     }
 
-    const fetchUserProfile = async () => {
-      try {
-        const response = await getUserProfileService(token);
-
-        setUser(response.data.data.user);
-        setUserPhoto(response.data.data.user.photo);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-        setUser(null);
-      }
-    };
-
     fetchUserProfile();
   }, [token]);
+
+  const fetchUserProfile = async () => {
+    if (!token) return;
+
+    try {
+      const response = await getUserProfileService(token);
+
+      setUser(response.data.data.user);
+      setUserPhoto(response.data.data.user.photo);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setUser(null);
+    }
+  };
 
   useEffect(() => {
     if (!isAuthReady) return;
@@ -45,7 +47,16 @@ export default function AuthContextProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ token, setToken, user, userPhoto, setUserPhoto, isAuthReady }}
+      value={{
+        token,
+        setToken,
+        user,
+        setUser,
+        userPhoto,
+        setUserPhoto,
+        isAuthReady,
+        refreshUserProfile: fetchUserProfile,
+      }}
     >
       {children}
     </AuthContext.Provider>

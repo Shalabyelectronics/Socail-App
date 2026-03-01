@@ -49,7 +49,11 @@ export default function PostCard({
   if (!post) return null;
   const navigate = useNavigate();
 
-  const { token, user: currentUser } = useContext(AuthContext);
+  const {
+    token,
+    user: currentUser,
+    refreshUserProfile,
+  } = useContext(AuthContext);
   const { refreshBookmarkCount } = useContext(FeedContext);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -181,6 +185,9 @@ export default function PostCard({
       }
 
       localStorage.setItem("followedUsers", JSON.stringify(followedUsers));
+
+      // Refresh user profile to update following count
+      refreshUserProfile?.();
 
       toast.success(
         newFollowStatus

@@ -17,7 +17,7 @@ import {
 import { toast } from "react-toastify";
 
 export default function FollowSuggestions({ onFollowSuccess }) {
-  const { token } = useContext(AuthContext);
+  const { token, refreshUserProfile } = useContext(AuthContext);
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [followingMap, setFollowingMap] = useState({});
@@ -65,6 +65,9 @@ export default function FollowSuggestions({ onFollowSuccess }) {
 
       // Update following state
       setFollowingMap((prev) => ({ ...prev, [userId]: following }));
+
+      // Refresh user profile to update following count
+      refreshUserProfile?.();
 
       // Show success toast
       toast.success(

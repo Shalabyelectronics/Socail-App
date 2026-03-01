@@ -18,6 +18,7 @@ import AuthContextProvider from "./components/AuthContext/AuthContextProvider.js
 import PostDetails from "./components/PostDetails/PostDetails.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import UpdateProfileImage from "./components/UpdateProfileImage/UpdateProfileImage.jsx";
+import UpdateCoverPhoto from "./components/UpdateCoverPhoto/UpdateCoverPhoto.jsx";
 import ChangePassword from "./components/ChangePassword/ChangePassword.jsx";
 import NotificationsProvider from "./components/NotificationsContext/NotificationsProvider.jsx";
 import Notifications from "./pages/Notifications/Notifications.jsx";
@@ -99,6 +100,10 @@ function App() {
             {
               path: "update-profile-image",
               element: <UpdateProfileImage />,
+            },
+            {
+              path: "update-cover-photo",
+              element: <UpdateCoverPhoto />,
             },
             {
               path: "change-password",

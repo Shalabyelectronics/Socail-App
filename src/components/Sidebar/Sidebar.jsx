@@ -1,7 +1,7 @@
 // Sidebar.jsx
 import React from "react";
 import { Card, CardBody } from "@heroui/react";
-import { KeyRound, Camera } from "lucide-react";
+import { KeyRound, Camera, ImagePlus } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
@@ -28,10 +28,25 @@ export default function Sidebar() {
           )}
         </NavLink>
 
+        <NavLink to="/setting/update-cover-photo" className={getNavLinkClass}>
+          {({ isActive }) => (
+            <>
+              <ImagePlus
+                size={24}
+                className={isActive ? "text-[#5E17EB]" : ""}
+              />
+              <span className="hidden md:inline">Update Cover Photo</span>
+            </>
+          )}
+        </NavLink>
+
         <NavLink to="/setting/change-password" className={getNavLinkClass}>
           {({ isActive }) => (
             <>
-              <KeyRound size={24} className={isActive ? "text-[#5E17EB]" : ""} />
+              <KeyRound
+                size={24}
+                className={isActive ? "text-[#5E17EB]" : ""}
+              />
               <span className="hidden md:inline">Change Password</span>
             </>
           )}

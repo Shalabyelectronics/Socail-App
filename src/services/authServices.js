@@ -64,3 +64,17 @@ export const uploadProfileImageService = async (token, payload) => {
   });
   return response;
 };
+
+export const uploadCoverPhotoService = async (token, payload) => {
+  const data = new FormData();
+  if (payload.cover) {
+    data.append("cover", payload.cover);
+  }
+
+  const response = await axios.put(`${BaseURL}/users/upload-cover`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};

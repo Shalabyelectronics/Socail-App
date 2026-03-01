@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../components/AuthContext/AuthContextProvider";
 import {
-  getUserProfileService,
+  getUserProfileService as getUserPublicProfileService,
   followUserService,
 } from "../../services/userServices";
+import { getUserProfileService } from "../../services/authServices";
 import { Spinner, Card, CardHeader, Avatar, Button } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -13,7 +14,7 @@ export default function Following() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [followingStatuses, setFollowingStatuses] = useState({});
-  const { token } = useContext(AuthContext);
+  const { token, refreshUserProfile } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,27 +27,25 @@ export default function Following() {
       setIsLoading(true);
 
       try {
-        // Read followedUsers from localStorage
-        const followedUsers = JSON.parse(
-          localStorage.getItem("followedUsers") || "{}",
-        );
-        const userIds = Object.keys(followedUsers);
+        // Get current user's profile data which includes following array
+        const profileResponse = await getUserProfileService(token);
+        const followingArray = profileResponse.data.data.user.following || [];
 
-        if (userIds.length === 0) {
+        if (followingArray.length === 0) {
           setUsers([]);
           setIsLoading(false);
           return;
         }
 
-        // Fetch profile data for each followed user
+        // Fetch each followed user's profile data
         const invalidUserIds = [];
         const userProfiles = await Promise.all(
-          userIds.map(async (userId) => {
+          followingArray.map(async (userId) => {
             try {
-              const response = await getUserProfileService(token, userId);
+              const response = await getUserPublicProfileService(token, userId);
               return response.data.data.user;
             } catch (error) {
-              // If user not found (404), mark for removal from localStorage
+              // If user not found (404), mark for cleanup
               if (error.response?.status === 404) {
                 invalidUserIds.push(userId);
               } else {
@@ -56,16 +55,6 @@ export default function Following() {
             }
           }),
         );
-
-        // Clean up localStorage by removing invalid user IDs
-        if (invalidUserIds.length > 0) {
-          const updatedFollowedUsers = { ...followedUsers };
-          invalidUserIds.forEach((id) => delete updatedFollowedUsers[id]);
-          localStorage.setItem(
-            "followedUsers",
-            JSON.stringify(updatedFollowedUsers),
-          );
-        }
 
         // Filter out any failed requests
         const validUsers = userProfiles.filter((user) => user !== null);
@@ -109,6 +98,9 @@ export default function Following() {
         );
       }
       localStorage.setItem("followedUsers", JSON.stringify(followedUsers));
+
+      // Refresh user profile to update following count
+      refreshUserProfile?.();
 
       toast.success(
         newFollowStatus

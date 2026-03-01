@@ -22,6 +22,7 @@ import {
   Mail,
   Calendar,
   User,
+  ImagePlus,
 } from "lucide-react";
 import { AuthContext } from "../../components/AuthContext/AuthContextProvider";
 import {
@@ -30,15 +31,21 @@ import {
   followUserService,
 } from "../../services/userServices";
 import PostCard from "../../components/PostCard/PostCard";
+import UpdateCoverPhoto from "../../components/UpdateCoverPhoto/UpdateCoverPhoto";
 import { toast } from "react-toastify";
 
 export default function UserProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token, user: currentUser } = useContext(AuthContext);
+  const {
+    token,
+    user: currentUser,
+    refreshUserProfile,
+  } = useContext(AuthContext);
 
   const [userProfile, setUserProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [isCoverEditOpen, setIsCoverEditOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -164,6 +171,9 @@ export default function UserProfile() {
       }
       localStorage.setItem("followedUsers", JSON.stringify(followedUsers));
 
+      // Refresh user profile to update following count
+      refreshUserProfile?.();
+
       toast.success(
         following
           ? "User followed successfully! 🎉"
@@ -246,7 +256,7 @@ export default function UserProfile() {
       </div>
 
       {/* Cover Photo Banner */}
-      <div className="w-full mb-10 rounded-xl overflow-hidden">
+      <div className="relative w-full mb-10 rounded-xl overflow-hidden group">
         <img
           src={
             userProfile.cover ||
@@ -255,6 +265,18 @@ export default function UserProfile() {
           alt="Cover photo"
           className="w-full h-48 object-cover"
         />
+
+        {/* Edit Icon Overlay (Only for own profile) */}
+        {isOwnProfile && (
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <Button
+              isIconOnly
+              className="bg-white/90 hover:bg-white text-[#5E17EB] rounded-full"
+              onPress={() => setIsCoverEditOpen(true)}
+              startContent={<ImagePlus size={24} />}
+            />
+          </div>
+        )}
       </div>
 
       {/* Profile Header Card */}
@@ -417,6 +439,43 @@ export default function UserProfile() {
           </div>
         )}
       </div>
+
+      {/* Cover Photo Edit Modal */}
+      {isCoverEditOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-[600px]">
+            <CardHeader className="flex justify-between items-center p-6">
+              <h2 className="text-2xl font-bold">Update Cover Photo</h2>
+              <Button
+                isIconOnly
+                className="bg-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                onPress={() => setIsCoverEditOpen(false)}
+              >
+                ✕
+              </Button>
+            </CardHeader>
+            <CardBody className="p-6 pt-0">
+              <UpdateCoverPhoto
+                onSuccess={() => {
+                  setIsCoverEditOpen(false);
+                  // Refresh the user profile to show updated cover
+                  const fetchProfile = async () => {
+                    try {
+                      const response = await getUserProfileService(token, id);
+                      setUserProfile(
+                        response.data.data?.user || response.data.data,
+                      );
+                    } catch (error) {
+                      console.error("Failed to refresh profile", error);
+                    }
+                  };
+                  fetchProfile();
+                }}
+              />
+            </CardBody>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
