@@ -232,14 +232,18 @@ export default function Followers() {
                   </p>
                 </div>
               </div>
-              <Button
-                size="sm"
-                color={followingStatuses[user._id] ? "default" : "primary"}
-                variant={followingStatuses[user._id] ? "bordered" : "solid"}
-                onPress={() => handleFollowClick(user._id)}
-              >
-                {followingStatuses[user._id] ? "Following" : "Follow Back"}
-              </Button>
+              {/* Only show follow button if not viewing own profile */}
+              {user._id !== currentUser?.id &&
+                user._id !== currentUser?._id && (
+                  <Button
+                    size="sm"
+                    color={followingStatuses[user._id] ? "default" : "primary"}
+                    variant={followingStatuses[user._id] ? "bordered" : "solid"}
+                    onPress={() => handleFollowClick(user._id)}
+                  >
+                    {followingStatuses[user._id] ? "Following" : "Follow Back"}
+                  </Button>
+                )}
             </CardHeader>
           </Card>
         ))}
