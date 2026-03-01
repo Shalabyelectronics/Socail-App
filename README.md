@@ -100,7 +100,7 @@ A modern social media web app built with React, Vite, HeroUI, and Tailwind CSS.
 
 ## Mentor Review Checklist (Screenshots Needed)
 
-> Replace each placeholder with your real screenshot path and caption.
+![alt text](image.png)
 
 ### 1) Auth Screens
 

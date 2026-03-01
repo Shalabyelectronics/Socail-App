@@ -98,14 +98,7 @@ export default function FollowSuggestions({ onFollowSuccess }) {
   }
 
   if (suggestions.length === 0) {
-    return (
-      <Card className="w-full shadow-md rounded-xl border border-gray-200 dark:border-gray-700 mb-4">
-        <CardBody className="py-8 text-center">
-          <Users size={32} className="mx-auto text-gray-400 mb-2" />
-          <p className="text-gray-500">No suggestions available right now</p>
-        </CardBody>
-      </Card>
-    );
+    return null;
   }
 
   return (
