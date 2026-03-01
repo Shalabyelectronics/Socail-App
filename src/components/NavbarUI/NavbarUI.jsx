@@ -58,11 +58,12 @@ export default function NavbarUI() {
               <FaBell className="size-[20px] sm:size-[22px]" />
             </Badge>
           </button>
-          <div className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center ">
+          {/* Maybe later we can activate it if users can send message to each others */}
+          {/* <div className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center ">
             <Badge color="primary" content="5" size="md">
               <LuMessageSquareHeart className="text-gray-700 size-[20px] sm:size-[22px]" />
             </Badge>
-          </div>
+          </div> */}
           <button
             type="button"
             onClick={handleNavigateToBookmarks}
