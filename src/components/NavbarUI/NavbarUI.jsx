@@ -23,8 +23,9 @@ import { FeedContext } from "../FeedContext/FeedContextProvider";
 import { NotificationsContext } from "../NotificationsContext/NotificationsProvider";
 export default function NavbarUI() {
   const { setToken, user, userPhoto } = useContext(AuthContext);
-  const { unreadCount } = useContext(NotificationsContext);
-  const { bookmarkCount } = useContext(FeedContext);
+  const { unreadCount, isUnreadCountLoading } =
+    useContext(NotificationsContext);
+  const { bookmarkCount, isBookmarkCountLoading } = useContext(FeedContext);
   const navigate = useNavigate();
 
   const handleNavigateToBookmarks = () => {
@@ -52,11 +53,15 @@ export default function NavbarUI() {
             type="button"
             onClick={handleNavigateToNotifications}
             aria-label="view notifications page"
-            className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center "
+            className="bg-gray-200 rounded-full size-10 cursor-pointer flex justify-center items-center "
           >
-            <Badge color="primary" content={unreadCount} size="md">
-              <FaBell className="size-[20px] sm:size-[22px]" />
-            </Badge>
+            {isUnreadCountLoading ? (
+              <Skeleton className="w-5 h-5 rounded-full" />
+            ) : (
+              <Badge color="primary" content={unreadCount} size="md">
+                <FaBell className="size-5 sm:size-5.5" />
+              </Badge>
+            )}
           </button>
           {/* Maybe later we can activate it if users can send message to each others */}
           {/* <div className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center ">
@@ -67,18 +72,22 @@ export default function NavbarUI() {
           <button
             type="button"
             onClick={handleNavigateToBookmarks}
-            className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center hover:bg-gray-300 transition-colors"
+            className="bg-gray-200 rounded-full size-10 cursor-pointer flex justify-center items-center hover:bg-gray-300 transition-colors"
             aria-label="View bookmarked posts"
           >
-            <Badge color="primary" content={bookmarkCount} size="md">
-              <Bookmark size={22} className="text-gray-700" />
-            </Badge>
+            {isBookmarkCountLoading ? (
+              <Skeleton className="w-5 h-5 rounded-full" />
+            ) : (
+              <Badge color="primary" content={bookmarkCount} size="md">
+                <Bookmark size={22} className="text-gray-700" />
+              </Badge>
+            )}
           </button>
           <Dropdown placement="bottom-end">
             <DropdownTrigger>
               <button
                 type="button"
-                className="bg-gray-200 rounded-full size-[40px] cursor-pointer flex justify-center items-center hover:bg-gray-300 transition-colors"
+                className="bg-gray-200 rounded-full size-10 cursor-pointer flex justify-center items-center hover:bg-gray-300 transition-colors"
                 aria-label="View connections"
               >
                 <Users size={22} className="text-gray-700" />
@@ -116,7 +125,7 @@ export default function NavbarUI() {
               <Avatar
                 isBordered
                 as="button"
-                className="transition-transform"
+                className="transition-transform cursor-pointer"
                 color="secondary"
                 name={user?.name || "User"}
                 size="sm"

@@ -16,10 +16,13 @@ export default function NotificationsProvider({ children }) {
   const { token } = useContext(AuthContext);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isUnreadCountLoading, setIsUnreadCountLoading] = useState(true);
 
   const refreshUnreadCount = useCallback(async () => {
+    setIsUnreadCountLoading(true);
     if (!token) {
       setUnreadCount(0);
+      setIsUnreadCountLoading(false);
       return;
     }
     try {
@@ -27,6 +30,8 @@ export default function NotificationsProvider({ children }) {
       setUnreadCount(response.data.data.unreadCount);
     } catch (error) {
       console.error("Error getting unreadCount");
+    } finally {
+      setIsUnreadCountLoading(false);
     }
   }, [token]);
 
@@ -52,6 +57,7 @@ export default function NotificationsProvider({ children }) {
         notifications,
         setNotifications,
         unreadCount,
+        isUnreadCountLoading,
         setUnreadCount,
         refreshUnreadCount,
       }}
